@@ -147,13 +147,10 @@ def build_site():
 </head>
 <body>
   <div id="root"></div>
-  <script>
-    function initStlite() {{
-      if (typeof stlite === "undefined") {{
-        setTimeout(initStlite, 100);
-        return;
-      }}
+  <script type="module">
+    async function initStlite() {{
       try {{
+        const stlite = await import("/stlite/stlite.js");
         stlite.mount({{
           entrypoint: "app/app.py",
           files: {{
