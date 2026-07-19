@@ -16,6 +16,13 @@ Usage:
     # or open index.html in a browser (when bundled with Stlite)
 """
 
+import sys
+from pathlib import Path
+
+# Add parent directory to path so 'app' package can be imported
+# even though app/app.py exists as a module in the same namespace
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 import streamlit as st
 
 from app.components import dashboard, signal_table, timeline, topic_cloud
