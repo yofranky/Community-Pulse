@@ -143,7 +143,7 @@ def build_site():
     body {{ margin: 0; padding: 0; background: #F9FAFB; }}
     #root {{ width: 100vw; height: 100vh; }}
   </style>
-  <script src="/stlite/stlite.js"></script>
+  <script type="module" src="/stlite/stlite.js"></script>
 </head>
 <body>
   <div id="root"></div>
