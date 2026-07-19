@@ -1,54 +1,96 @@
 """
 Dashboard component for Community Pulse.
 
-Renders KPI cards showing high-level community health metrics.
+Renders intelligence-focused KPI cards at the top of the dashboard:
+- Active Threats (alert_level == 3)
+- Migration Opportunities (classification == "opportunity")
+- New Technical Mentions (engineering/blog/cloud_native in last 7 days)
 """
 
 import streamlit as st
 
 
-def render(stats: dict):
-    """Render KPI summary cards at the top of the dashboard."""
-    col1, col2, col3, col4, col5 = st.columns(5)
+def render(intel_stats: dict):
+    """Render intelligence KPI summary cards.
+
+    Args:
+        intel_stats: dict from get_intel_stats() with keys:
+            active_threats, migration_opportunities, new_technical_mentions,
+            total_signals, overall_sentiment
+    """
+    col1, col2, col3 = st.columns(3)
 
     with col1:
-        st.metric(
-            label="Total Signals",
-            value=stats["total_signals"],
-            help="Total community signals collected across all sources",
+        st.markdown(
+            f"""
+            <div style="
+                background: #FFFFFF;
+                border: 1px solid #E5E7EB;
+                border-left: 4px solid #DC2626;
+                border-radius: 8px;
+                padding: 16px;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            ">
+                <p style="margin:0; font-size:14px; color:#6B7280; font-weight:500;">
+                    🚨 Active Threats
+                </p>
+                <p style="margin:4px 0 0 0; font-size:32px; font-weight:700; color:#DC2626;">
+                    {intel_stats['active_threats']}
+                </p>
+                <p style="margin:2px 0 0 0; font-size:12px; color:#9CA3AF;">
+                    Competitor praise or Everpure criticism
+                </p>
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
 
     with col2:
-        st.metric(
-            label="Sources",
-            value=stats["sources_count"],
-            help="Number of community channels being monitored",
+        st.markdown(
+            f"""
+            <div style="
+                background: #FFFFFF;
+                border: 1px solid #E5E7EB;
+                border-left: 4px solid #16A34A;
+                border-radius: 8px;
+                padding: 16px;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            ">
+                <p style="margin:0; font-size:14px; color:#6B7280; font-weight:500;">
+                    💡 Migration Opportunities
+                </p>
+                <p style="margin:4px 0 0 0; font-size:32px; font-weight:700; color:#16A34A;">
+                    {intel_stats['migration_opportunities']}
+                </p>
+                <p style="margin:2px 0 0 0; font-size:12px; color:#9CA3AF;">
+                    User inquiries and competitor criticism
+                </p>
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
 
     with col3:
-        sentiment = stats["overall_sentiment"]
-        delta = None
-        if sentiment >= 0.5:
-            delta = "positive"
-        elif sentiment <= -0.3:
-            delta = "negative"
-        st.metric(
-            label="Overall Sentiment",
-            value=f"{sentiment:+.2f}",
-            delta=delta,
-            help="Average sentiment score across all signals (-1.0 to 1.0)",
-        )
-
-    with col4:
-        st.metric(
-            label="Top Topic",
-            value=stats["top_topic"].replace("_", " ").title(),
-            help="Most discussed topic in the community",
-        )
-
-    with col5:
-        st.metric(
-            label="Trend Span",
-            value=f"{stats['trend_days']} days",
-            help="Number of days in the sentiment trend window",
+        st.markdown(
+            f"""
+            <div style="
+                background: #FFFFFF;
+                border: 1px solid #E5E7EB;
+                border-left: 4px solid #1B2A4A;
+                border-radius: 8px;
+                padding: 16px;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            ">
+                <p style="margin:0; font-size:14px; color:#6B7280; font-weight:500;">
+                    🔬 New Technical Mentions
+                </p>
+                <p style="margin:4px 0 0 0; font-size:32px; font-weight:700; color:#1B2A4A;">
+                    {intel_stats['new_technical_mentions']}
+                </p>
+                <p style="margin:2px 0 0 0; font-size:12px; color:#9CA3AF;">
+                    Engineering & cloud-native signals (7 days)
+                </p>
+            </div>
+            """,
+            unsafe_allow_html=True,
         )
