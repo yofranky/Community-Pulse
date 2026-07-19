@@ -29,24 +29,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install Stlite
-        run: |
-          python -m pip install --upgrade pip
-          pip install stlite
-
-      - name: Build Stlite app
-        run: |
-          # Stlite bundles the Streamlit app into a static HTML/JS site
-          stlite build app/app.py --output-dir _site
-
-      - name: Copy data.json into the build output
-        run: |
-          cp data/data.json _site/data.json
+      - name: Build static site
+        run: python3 scripts/build_stlite_site.py
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
