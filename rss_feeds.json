@@ -6,6 +6,7 @@
     "source_label": "blog",
     "topic_hint": "product_news",
     "category": "own_brand",
+    "source_bias": 0,
     "priority": "high",
     "max_entries_per_run": 10,
     "rate_limit_seconds": 3600
@@ -17,6 +18,7 @@
     "source_label": "engineering",
     "topic_hint": "engineering",
     "category": "own_brand",
+    "source_bias": 0,
     "priority": "high",
     "max_entries_per_run": 15,
     "rate_limit_seconds": 3600
@@ -28,6 +30,7 @@
     "source_label": "industry_news",
     "topic_hint": "industry_trends",
     "category": "industry",
+    "source_bias": 0,
     "priority": "high",
     "max_entries_per_run": 20,
     "rate_limit_seconds": 21600
@@ -39,6 +42,7 @@
     "source_label": "cloud_native",
     "topic_hint": "cloud_native",
     "category": "industry",
+    "source_bias": 0,
     "priority": "medium",
     "max_entries_per_run": 15,
     "rate_limit_seconds": 43200
@@ -50,6 +54,7 @@
     "source_label": "ai_ops",
     "topic_hint": "ai_ml",
     "category": "industry",
+    "source_bias": 0,
     "priority": "medium",
     "max_entries_per_run": 15,
     "rate_limit_seconds": 43200
@@ -61,6 +66,7 @@
     "source_label": "devops",
     "topic_hint": "devops",
     "category": "industry",
+    "source_bias": 0,
     "priority": "medium",
     "max_entries_per_run": 10,
     "rate_limit_seconds": 43200
@@ -72,6 +78,7 @@
     "source_label": "netapp_community",
     "topic_hint": "competitor_news",
     "category": "competitor",
+    "source_bias": 1,
     "priority": "high",
     "max_entries_per_run": 15,
     "rate_limit_seconds": 21600
@@ -83,6 +90,7 @@
     "source_label": "dell_infohub",
     "topic_hint": "competitor_news",
     "category": "competitor",
+    "source_bias": 1,
     "priority": "high",
     "max_entries_per_run": 15,
     "rate_limit_seconds": 21600
@@ -94,9 +102,10 @@
     "source_label": "reddit",
     "topic_hint": "community_discussion",
     "category": "community",
-    "priority": "medium",
-    "max_entries_per_run": 20,
-    "rate_limit_seconds": 3600
+    "source_bias": 0,
+    "priority": "high",
+    "max_entries_per_run": 40,
+    "rate_limit_seconds": 600
   },
   {
     "id": "reddit_storage",
@@ -105,8 +114,9 @@
     "source_label": "reddit",
     "topic_hint": "community_discussion",
     "category": "community",
-    "priority": "medium",
-    "max_entries_per_run": 20,
-    "rate_limit_seconds": 3600
+    "source_bias": 0,
+    "priority": "high",
+    "max_entries_per_run": 40,
+    "rate_limit_seconds": 600
   }
 ]

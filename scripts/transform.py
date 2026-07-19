@@ -91,6 +91,31 @@ MIN_CONTENT_LENGTH = 50
 # Title similarity threshold for deduplication (0.0 = identical, higher = more different)
 TITLE_SIMILARITY_THRESHOLD = 0.15
 
+# Cross-source content dedup window in seconds (72 hours)
+CROSS_SOURCE_DEDUP_WINDOW = 259200
+
+# Source bias penalty: competitor-owned channels get +1 to alert_level
+# so their self-praise doesn't trigger false threat alerts.
+# 0 = neutral/third-party, 1 = biased (competitor-owned)
+SOURCE_BIAS_MAP: dict[str, int] = {
+    "netapp_community": 1,
+    "dell_infohub": 1,
+}
+
+
+def content_fingerprint(text: str) -> str:
+    """
+    Generate a simple content fingerprint for cross-source deduplication.
+
+    Uses a hash of the first 200 characters after stripping whitespace
+    and lowercasing. This catches syndicated content that appears across
+    multiple feeds (e.g., a press release on NetApp's blog + StorageNewsletter).
+
+    Returns a 16-char hex string.
+    """
+    normalized = re.sub(r"\s+", " ", text.lower().strip())[:200]
+    return hashlib.sha256(normalized.encode()).hexdigest()[:16]
+
 
 def normalize_jargon(text: str) -> str:
     """
@@ -491,17 +516,57 @@ def transform(
     normalized: list[dict] = []
     sources_aggregated = []
 
+    # Cross-source content fingerprint tracker
+    # Maps fingerprint -> (earliest_date, source)
+    seen_fingerprints: dict[str, tuple[str, str]] = {}
+
     for source, signals in cleaned.items():
         if signals:
             sources_aggregated.append(source)
         for raw in signals:
             signal = normalize_signal(raw, source)
             if signal:
-                # Run competitor watch on every signal
                 content = signal.get("content_preview", "")
                 title = raw.get("title", "")
+
+                # ── Cross-source content dedup ──────────────────────
+                # If the same content appears across multiple feeds
+                # (e.g., a press release on NetApp's blog + StorageNewsletter),
+                # keep only the earliest occurrence.
+                fingerprint = content_fingerprint(content)
+                signal_date = signal.get("date", "")
+
+                if fingerprint in seen_fingerprints:
+                    earliest_date, earliest_source = seen_fingerprints[fingerprint]
+                    # Only suppress if the current signal is newer (within 72h window)
+                    if earliest_date and signal_date:
+                        try:
+                            earliest_dt = datetime.fromisoformat(earliest_date)
+                            current_dt = datetime.fromisoformat(signal_date)
+                            diff_seconds = (current_dt - earliest_dt).total_seconds()
+                            if 0 <= diff_seconds <= CROSS_SOURCE_DEDUP_WINDOW:
+                                print(f"[dedup] Cross-source duplicate suppressed: "
+                                      f"'{source}' matches '{earliest_source}' "
+                                      f"(fingerprint: {fingerprint})")
+                                continue
+                        except (ValueError, TypeError):
+                            pass
+
+                seen_fingerprints[fingerprint] = (signal_date, source)
+
+                # ── Competitor watch with source bias ───────────────
                 intel = competitor_watch(content, title)
                 if intel["alert_level"] > 1:
+                    # Apply source bias penalty: competitor-owned channels
+                    # get +1 to alert_level (their self-praise is expected)
+                    bias = SOURCE_BIAS_MAP.get(source, 0)
+                    if bias > 0 and intel["classification"] == "threat":
+                        # Downgrade biased threat to opportunity
+                        intel["alert_level"] = 2
+                        intel["classification"] = "opportunity"
+                        intel["source_bias_applied"] = True
+                        print(f"[intel] BIAS ADJUSTED: {source} self-praise "
+                              f"downgraded to opportunity")
                     signal["competitor_intel"] = intel
                     print(f"[intel] {intel['classification'].upper()}: "
                           f"{intel['entities_detected']} (level {intel['alert_level']})")
