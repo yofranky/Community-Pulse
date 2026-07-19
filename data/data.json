@@ -1,0 +1,104 @@
+{
+  "meta": {
+    "version": 1,
+    "last_updated": "2026-07-19T19:15:00Z",
+    "total_signals": 6,
+    "sources_aggregated": ["reddit", "discord", "github_discussions"]
+  },
+  "signals": [
+    {
+      "id": "sig_a1b2c3d4",
+      "source": "reddit",
+      "source_url": "https://reddit.com/r/everpure/comments/example1",
+      "date": "2026-07-18T14:30:00Z",
+      "topic": "water_filtration_performance",
+      "sentiment_score": 0.75,
+      "confidence": 0.85,
+      "author": "water_enthusiast",
+      "content_preview": "The new filter lasts way longer than expected. Installed it 3 months ago and the pressure is still great.",
+      "engagement": { "likes": 42, "replies": 7, "shares": 3 },
+      "tags": ["filter", "performance", "positive"]
+    },
+    {
+      "id": "sig_e5f6g7h8",
+      "source": "reddit",
+      "source_url": "https://reddit.com/r/everpure/comments/example2",
+      "date": "2026-07-18T09:15:00Z",
+      "topic": "customer_support",
+      "sentiment_score": -0.40,
+      "confidence": 0.70,
+      "author": "frustrated_user",
+      "content_preview": "Been waiting on a replacement cartridge for 2 weeks. Support keeps saying they'll escalate but nothing happens.",
+      "engagement": { "likes": 18, "replies": 12, "shares": 1 },
+      "tags": ["support", "shipping", "negative"]
+    },
+    {
+      "id": "sig_i9j0k1l2",
+      "source": "discord",
+      "source_url": "https://discord.gg/everpure/thread/123",
+      "date": "2026-07-17T20:45:00Z",
+      "topic": "product_durability",
+      "sentiment_score": 0.60,
+      "confidence": 0.80,
+      "author": "plumber_pro",
+      "content_preview": "Been installing these for commercial clients for 5 years. The new QL3 model is noticeably more robust than the previous gen.",
+      "engagement": { "likes": 31, "replies": 5, "shares": 0 },
+      "tags": ["durability", "commercial", "positive"]
+    },
+    {
+      "id": "sig_m3n4o5p6",
+      "source": "discord",
+      "source_url": "https://discord.gg/everpure/thread/124",
+      "date": "2026-07-17T16:00:00Z",
+      "topic": "installation_difficulty",
+      "sentiment_score": -0.20,
+      "confidence": 0.65,
+      "author": "diy_homeowner",
+      "content_preview": "The quick-connect fittings are not as intuitive as the instructions suggest. Took me 2 hours to get a seal.",
+      "engagement": { "likes": 15, "replies": 9, "shares": 2 },
+      "tags": ["installation", "diy", "neutral"]
+    },
+    {
+      "id": "sig_q7r8s9t0",
+      "source": "github_discussions",
+      "source_url": "https://github.com/everpure/community/discussions/45",
+      "date": "2026-07-16T11:00:00Z",
+      "topic": "feature_request",
+      "sentiment_score": 0.30,
+      "confidence": 0.75,
+      "author": "dev_ops_mike",
+      "content_preview": "Would love to see a smart monitoring add-on that tracks filter life and sends alerts. API access would be a game changer.",
+      "engagement": { "likes": 27, "replies": 14, "shares": 5 },
+      "tags": ["feature", "smart", "api", "neutral"]
+    },
+    {
+      "id": "sig_u1v2w3x4",
+      "source": "github_discussions",
+      "source_url": "https://github.com/everpure/community/discussions/44",
+      "date": "2026-07-15T08:30:00Z",
+      "topic": "water_filtration_performance",
+      "sentiment_score": 0.90,
+      "confidence": 0.90,
+      "author": "chef_marco",
+      "content_preview": "Switched to Everpure for the restaurant 6 months ago. Water taste tests are consistently better and scale buildup is down 80%.",
+      "engagement": { "likes": 56, "replies": 8, "shares": 12 },
+      "tags": ["commercial", "taste", "scale", "positive"]
+    }
+  ],
+  "summary": {
+    "overall_sentiment": 0.33,
+    "top_topics": [
+      { "topic": "water_filtration_performance", "count": 2, "avg_sentiment": 0.83 },
+      { "topic": "customer_support", "count": 1, "avg_sentiment": -0.40 },
+      { "topic": "product_durability", "count": 1, "avg_sentiment": 0.60 },
+      { "topic": "installation_difficulty", "count": 1, "avg_sentiment": -0.20 },
+      { "topic": "feature_request", "count": 1, "avg_sentiment": 0.30 }
+    ],
+    "sentiment_trend": [
+      { "date": "2026-07-15", "avg_sentiment": 0.90, "signal_count": 1 },
+      { "date": "2026-07-16", "avg_sentiment": 0.30, "signal_count": 1 },
+      { "date": "2026-07-17", "avg_sentiment": 0.20, "signal_count": 2 },
+      { "date": "2026-07-18", "avg_sentiment": 0.18, "signal_count": 2 }
+    ]
+  }
+}
