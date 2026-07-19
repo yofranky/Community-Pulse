@@ -14,7 +14,7 @@
         "total_signals": { "type": "integer", "minimum": 0 },
         "sources_aggregated": {
           "type": "array",
-          "items": { "type": "string", "enum": ["reddit", "discord", "github_discussions", "blog", "github_releases", "industry_news", "engineering", "cloud_native", "ai_ops", "devops"] }
+          "items": { "type": "string", "enum": ["reddit", "discord", "github_discussions", "blog", "github_releases", "industry_news", "engineering", "cloud_native", "ai_ops", "devops", "netapp_community", "dell_infohub"] }
         }
       }
     },
@@ -25,7 +25,7 @@
         "required": ["id", "source", "date", "topic", "sentiment_score"],
         "properties": {
           "id": { "type": "string", "pattern": "^sig_[a-f0-9]+$" },
-          "source": { "type": "string", "enum": ["reddit", "discord", "github_discussions", "blog", "github_releases", "industry_news", "engineering", "cloud_native", "ai_ops", "devops"] },
+          "source": { "type": "string", "enum": ["reddit", "discord", "github_discussions", "blog", "github_releases", "industry_news", "engineering", "cloud_native", "ai_ops", "devops", "netapp_community", "dell_infohub"] },
           "source_url": { "type": "string", "format": "uri" },
           "date": { "type": "string", "format": "date-time" },
           "topic": { "type": "string", "minLength": 1 },
@@ -44,6 +44,19 @@
           "tags": {
             "type": "array",
             "items": { "type": "string" }
+          },
+          "competitor_intel": {
+            "type": "object",
+            "required": ["alert_level", "classification", "entities_detected"],
+            "properties": {
+              "alert_level": { "type": "integer", "minimum": 1, "maximum": 3 },
+              "classification": { "type": "string", "enum": ["neutral", "opportunity", "threat"] },
+              "entities_detected": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "signal_text": { "type": "string", "maxLength": 200 }
+            }
           }
         }
       }

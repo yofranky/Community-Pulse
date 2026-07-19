@@ -1,9 +1,9 @@
 {
   "meta": {
-    "version": 2,
-    "last_updated": "2026-07-19T20:45:00Z",
-    "total_signals": 8,
-    "sources_aggregated": ["blog", "engineering", "industry_news", "cloud_native", "ai_ops"]
+    "version": 3,
+    "last_updated": "2026-07-19T21:25:00Z",
+    "total_signals": 11,
+    "sources_aggregated": ["blog", "engineering", "industry_news", "cloud_native", "ai_ops", "netapp_community", "dell_infohub", "reddit"]
   },
   "signals": [
     {
@@ -109,26 +109,85 @@
       "content_preview": "Best practices for running stateful workloads on Kubernetes: persistent volume claims, storage classes, and backup strategies. Includes benchmarks for database workloads on various CSI driver implementations.",
       "engagement": { "likes": 112, "replies": 27, "shares": 38 },
       "tags": ["cloud_native_storage", "kubernetes", "persistent_volume", "stateful_workload"]
+    },
+    {
+      "id": "sig_i9j0k1l2",
+      "source": "netapp_community",
+      "source_url": "https://community.netapp.com/t5/Blogs/netapp-ontap-leader-2026/ct-p/netapp-blogs",
+      "date": "2026-07-19T11:00:00Z",
+      "topic": "competitor_news",
+      "sentiment_score": 0.72,
+      "confidence": 0.82,
+      "author": "netapp_blog",
+      "content_preview": "NetApp ONTAP recognized as a leader in enterprise storage for the seventh consecutive year. The latest release delivers groundbreaking performance improvements for hybrid cloud deployments and AI workloads.",
+      "engagement": { "likes": 88, "replies": 12, "shares": 34 },
+      "tags": ["netapp", "competitor_news", "industry_analysis", "hybrid_cloud"],
+      "competitor_intel": {
+        "alert_level": 3,
+        "classification": "threat",
+        "entities_detected": ["netapp"],
+        "signal_text": "netapp ontap recognized as a leader in enterprise storage for the seventh consecutive year. the latest release delivers groundbreaking performance"
+      }
+    },
+    {
+      "id": "sig_j0k1l2m3",
+      "source": "reddit",
+      "source_url": "https://www.reddit.com/r/sysadmin/comments/everpure_vs_dell",
+      "date": "2026-07-18T16:20:00Z",
+      "topic": "community_discussion",
+      "sentiment_score": 0.30,
+      "confidence": 0.70,
+      "author": "sysadmin_user",
+      "content_preview": "Anyone else considering migrating from Dell PowerStore to Everpure? We're tired of the licensing complexity and the support has been inconsistent. Looking at Everpure's all-flash line as an alternative.",
+      "engagement": { "likes": 45, "replies": 23, "shares": 7 },
+      "tags": ["community_discussion", "dell", "everpure", "migration"],
+      "competitor_intel": {
+        "alert_level": 2,
+        "classification": "opportunity",
+        "entities_detected": ["dell", "everpure"],
+        "signal_text": "anyone else considering migrating from dell powerstore to everpure? we're tired of the licensing complexity and the support has been"
+      }
+    },
+    {
+      "id": "sig_k1l2m3n4",
+      "source": "dell_infohub",
+      "source_url": "https://infohub.delltechnologies.com/t/powerstore-next-gen-announcement/rss",
+      "date": "2026-07-17T14:00:00Z",
+      "topic": "competitor_news",
+      "sentiment_score": 0.60,
+      "confidence": 0.78,
+      "author": "dell_tech",
+      "content_preview": "Introducing the next generation of Dell PowerStore: a new architecture that delivers up to 40% better performance than previous generations. Purpose-built for modern data centers with integrated AIOps capabilities.",
+      "engagement": { "likes": 67, "replies": 15, "shares": 22 },
+      "tags": ["dell", "competitor_news", "storage_performance", "product_release"],
+      "competitor_intel": {
+        "alert_level": 3,
+        "classification": "threat",
+        "entities_detected": ["dell"],
+        "signal_text": "introducing the next generation of dell powerstore: a new architecture that delivers up to 40% better performance than previous generations"
+      }
     }
   ],
   "summary": {
-    "overall_sentiment": 0.67,
+    "overall_sentiment": 0.64,
     "top_topics": [
       { "topic": "cloud_native_storage", "count": 2, "avg_sentiment": 0.65 },
+      { "topic": "competitor_news", "count": 2, "avg_sentiment": 0.66 },
       { "topic": "storage_performance", "count": 1, "avg_sentiment": 0.85 },
       { "topic": "enterprise_data_cloud", "count": 1, "avg_sentiment": 0.70 },
       { "topic": "industry_analysis", "count": 1, "avg_sentiment": 0.60 },
       { "topic": "security_compliance", "count": 1, "avg_sentiment": 0.45 },
       { "topic": "ai_ml_infrastructure", "count": 1, "avg_sentiment": 0.65 },
-      { "topic": "devops_sre", "count": 1, "avg_sentiment": 0.80 }
+      { "topic": "devops_sre", "count": 1, "avg_sentiment": 0.80 },
+      { "topic": "community_discussion", "count": 1, "avg_sentiment": 0.30 }
     ],
     "sentiment_trend": [
       { "date": "2026-07-14", "avg_sentiment": 0.55, "signal_count": 1 },
       { "date": "2026-07-15", "avg_sentiment": 0.80, "signal_count": 1 },
       { "date": "2026-07-16", "avg_sentiment": 0.55, "signal_count": 2 },
-      { "date": "2026-07-17", "avg_sentiment": 0.68, "signal_count": 2 },
-      { "date": "2026-07-18", "avg_sentiment": 0.70, "signal_count": 1 },
-      { "date": "2026-07-19", "avg_sentiment": 0.85, "signal_count": 1 }
+      { "date": "2026-07-17", "avg_sentiment": 0.65, "signal_count": 3 },
+      { "date": "2026-07-18", "avg_sentiment": 0.50, "signal_count": 2 },
+      { "date": "2026-07-19", "avg_sentiment": 0.79, "signal_count": 2 }
     ]
   }
 }

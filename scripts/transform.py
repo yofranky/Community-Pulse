@@ -235,6 +235,129 @@ def clean_signals(raw_signals: dict[str, list[dict]]) -> dict[str, list[dict]]:
     return cleaned
 
 
+# ── Competitor Watch ───────────────────────────────────────────────
+# Defensive/Offensive intelligence: detects competitor mentions and
+# classifies signals as Threat, Opportunity, or Neutral.
+
+COMPETITOR_PATTERNS: dict[str, re.Pattern] = {
+    "everpure": re.compile(r"\b(everpure|pure\s?storage)\b", re.IGNORECASE),
+    "netapp": re.compile(r"\bnetapp\b", re.IGNORECASE),
+    "dell": re.compile(r"\bdell\b", re.IGNORECASE),
+    "dell_emc": re.compile(r"\bdell[-\s]?emc\b", re.IGNORECASE),
+    "emc": re.compile(r"\bemc\b", re.IGNORECASE),
+    "hpe": re.compile(r"\bhpe\b|hewlett[\s-]?packard[\s-]?enterprise", re.IGNORECASE),
+    "ibm": re.compile(r"\bibm\b", re.IGNORECASE),
+    "hitachi": re.compile(r"\bhitachi\b", re.IGNORECASE),
+    "nutanix": re.compile(r"\bnutanix\b", re.IGNORECASE),
+    "pure_storage": re.compile(r"\bpure\s?storage\b", re.IGNORECASE),
+}
+
+PRAISE_PATTERNS = re.compile(
+    r"\b(great|excellent|amazing|best[-\s]?in[-\s]?class|leader|outperform|"
+    r"superior|impressive|reliable|innovative|game[-\s]?changer|"
+    r"love|fantastic|outstanding|remarkable)\b",
+    re.IGNORECASE,
+)
+
+CRITICISM_PATTERNS = re.compile(
+    r"\b(poor|terrible|unreliable|slow|expensive|overpriced|outdated|"
+    r"buggy|frustrating|disappointing|failure|downtime|issue|problem|"
+    r"struggl|worse|mediocre|inconsistent|complex|difficult)\b",
+    re.IGNORECASE,
+)
+
+INQUIRY_PATTERNS = re.compile(
+    r"\b(how\s+does|compare|vs\.?|versus|alternative|migrate|"
+    r"switching|considering|evaluating|review|thoughts\?|"
+    r"anyone\s+use|recommend|experience\s+with)\b",
+    re.IGNORECASE,
+)
+
+
+def competitor_watch(text: str, title: str = "") -> dict:
+    """
+    Scan text for competitor mentions and classify the competitive signal.
+
+    Args:
+        text: Main content body to scan
+        title: Optional title to scan as well
+
+    Returns:
+        dict with keys:
+            - alert_level: int (1=neutral, 2=opportunity, 3=threat)
+            - classification: str ("neutral", "opportunity", "threat")
+            - entities_detected: list[str] of competitor names found
+            - signal_text: str excerpt of the relevant mention
+    """
+    combined = f"{title} {text}".lower()
+    entities_detected: list[str] = []
+
+    # Step 1: Find which entities are mentioned
+    for name, pattern in COMPETITOR_PATTERNS.items():
+        if pattern.search(combined):
+            entities_detected.append(name)
+
+    if not entities_detected:
+        return {
+            "alert_level": 1,
+            "classification": "neutral",
+            "entities_detected": [],
+            "signal_text": "",
+        }
+
+    # Step 2: Determine sentiment toward detected entities
+    has_praise = bool(PRAISE_PATTERNS.search(combined))
+    has_criticism = bool(CRITICISM_PATTERNS.search(combined))
+    has_inquiry = bool(INQUIRY_PATTERNS.search(combined))
+
+    # Determine if Everpure/Pure is one of the entities mentioned
+    everpure_mentioned = "everpure" in entities_detected or "pure_storage" in entities_detected
+    competitor_entities = [e for e in entities_detected if e not in ("everpure", "pure_storage")]
+
+    # ── Classification Logic ────────────────────────────────────
+    # Threat: Competitor praised OR Everpure criticized
+    if (competitor_entities and has_praise and not has_criticism) or \
+       (everpure_mentioned and has_criticism and not has_praise):
+        classification = "threat"
+        alert_level = 3
+    # Opportunity: Competitor criticized OR Everpure praised OR migration inquiry
+    elif (competitor_entities and has_criticism and not has_praise) or \
+         (everpure_mentioned and has_praise and not has_criticism) or \
+         (has_inquiry and competitor_entities):
+        classification = "opportunity"
+        alert_level = 2
+    # Mixed sentiment: both praise and criticism detected
+    elif has_praise and has_criticism:
+        # If competitor is praised AND criticized, it's mixed — lean toward threat
+        if competitor_entities:
+            classification = "threat"
+            alert_level = 3
+        else:
+            classification = "neutral"
+            alert_level = 1
+    else:
+        classification = "neutral"
+        alert_level = 1
+
+    # Step 3: Extract a short signal excerpt (first 150 chars of relevant area)
+    signal_text = ""
+    for entity in entities_detected:
+        # Find the entity in the combined text and grab surrounding context
+        idx = combined.find(entity)
+        if idx != -1:
+            start = max(0, idx - 40)
+            end = min(len(combined), idx + len(entity) + 80)
+            signal_text = combined[start:end].strip()
+            break
+
+    return {
+        "alert_level": alert_level,
+        "classification": classification,
+        "entities_detected": sorted(set(entities_detected)),
+        "signal_text": signal_text[:200],
+    }
+
+
 def normalize_signal(raw: dict, source: str) -> dict | None:
     """Convert a raw signal dict into the standard schema. Returns None if invalid."""
     content = raw.get("content_preview", "")
@@ -364,7 +487,7 @@ def transform(
     # Step 1: Clean — remove noise, deduplicate, normalize jargon
     cleaned = clean_signals(raw_signals)
 
-    # Step 2: Normalize all signals
+    # Step 2: Normalize all signals and run competitor watch
     normalized: list[dict] = []
     sources_aggregated = []
 
@@ -374,6 +497,14 @@ def transform(
         for raw in signals:
             signal = normalize_signal(raw, source)
             if signal:
+                # Run competitor watch on every signal
+                content = signal.get("content_preview", "")
+                title = raw.get("title", "")
+                intel = competitor_watch(content, title)
+                if intel["alert_level"] > 1:
+                    signal["competitor_intel"] = intel
+                    print(f"[intel] {intel['classification'].upper()}: "
+                          f"{intel['entities_detected']} (level {intel['alert_level']})")
                 normalized.append(signal)
 
     # Step 3: Merge with existing signals if provided (dedup by ID)
