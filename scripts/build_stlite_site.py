@@ -27,7 +27,7 @@ FILES_TO_INLINE = {
     "data/data.json": "data/data.json",
 }
 
-STLITE_CDN_URL = "https://cdn.jsdelivr.net/npm/@stlite/browser@1.8.1/build/stlite.js"
+STLITE_CDN_URL = "https://esm.sh/@stlite/browser@1.8.1"
 
 
 def escape_for_js_template(text: str) -> str:
