@@ -14,7 +14,7 @@
         "total_signals": { "type": "integer", "minimum": 0 },
         "sources_aggregated": {
           "type": "array",
-          "items": { "type": "string", "enum": ["reddit", "discord", "github_discussions", "blog", "github_releases", "industry_news"] }
+          "items": { "type": "string", "enum": ["reddit", "discord", "github_discussions", "blog", "github_releases", "industry_news", "engineering", "cloud_native", "ai_ops", "devops"] }
         }
       }
     },
@@ -25,7 +25,7 @@
         "required": ["id", "source", "date", "topic", "sentiment_score"],
         "properties": {
           "id": { "type": "string", "pattern": "^sig_[a-f0-9]+$" },
-          "source": { "type": "string", "enum": ["reddit", "discord", "github_discussions", "blog", "github_releases", "industry_news"] },
+          "source": { "type": "string", "enum": ["reddit", "discord", "github_discussions", "blog", "github_releases", "industry_news", "engineering", "cloud_native", "ai_ops", "devops"] },
           "source_url": { "type": "string", "format": "uri" },
           "date": { "type": "string", "format": "date-time" },
           "topic": { "type": "string", "minLength": 1 },

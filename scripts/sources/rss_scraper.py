@@ -6,11 +6,16 @@ each entry into the standardized signal schema.
 
 Handles connectivity errors gracefully so one dead feed never
 brings down the entire collection pipeline.
+
+Tuned for enterprise-grade RSS feeds in the data storage and
+infrastructure sector (Everpure Engineering Blog, StorageNewsletter,
+Kubernetes.io, AI Infrastructure Alliance, etc.).
 """
 
 import hashlib
 import json
 import os
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -39,7 +44,6 @@ def load_feed_config() -> list[dict]:
 
 def parse_date(entry: feedparser.FeedParserDict) -> str:
     """Extract and normalize a published/updated date from an RSS entry."""
-    # Try multiple date fields in order of reliability
     for attr in ("published_parsed", "updated_parsed", "created_parsed"):
         time_struct = getattr(entry, attr, None)
         if time_struct:
@@ -48,7 +52,6 @@ def parse_date(entry: feedparser.FeedParserDict) -> str:
             except (ValueError, TypeError):
                 continue
 
-    # Fall back to raw string if available
     for attr in ("published", "updated", "created"):
         raw = getattr(entry, attr, None)
         if raw:
@@ -59,17 +62,14 @@ def parse_date(entry: feedparser.FeedParserDict) -> str:
 
 def get_content_preview(entry: feedparser.FeedParserDict) -> str:
     """Extract a text preview from the entry, trying summary then content then title."""
-    # RSS <description> or Atom <summary>
     if hasattr(entry, "summary") and entry.summary:
         return _strip_html(entry.summary)[:500]
 
-    # Atom <content> (may be a list of dicts)
     if hasattr(entry, "content") and entry.content:
         for c in entry.content:
             if isinstance(c, dict) and "value" in c:
                 return _strip_html(c["value"])[:500]
 
-    # Fall back to title
     if hasattr(entry, "title") and entry.title:
         return entry.title[:500]
 
@@ -78,31 +78,106 @@ def get_content_preview(entry: feedparser.FeedParserDict) -> str:
 
 def _strip_html(text: str) -> str:
     """Very basic HTML tag stripping. Keeps it lightweight (no BeautifulSoup dependency)."""
-    import re
-
     clean = re.sub(r"<[^>]+>", " ", text)
     clean = re.sub(r"\s+", " ", clean).strip()
     return clean
 
 
 def infer_topic(text: str, topic_hint: str | None = None) -> str:
-    """Keyword-based topic inference with fallback to configured hint."""
+    """
+    Keyword-based topic inference tuned for enterprise storage and data infrastructure.
+
+    Covers: Enterprise Data Cloud, AI-ready infrastructure, Cloud-Native storage,
+    Kubernetes, DevOps, and industry trends.
+    """
     text_lower = text.lower()
 
-    if any(w in text_lower for w in ["filter", "filtration", "pressure", "flow", "cartridge"]):
-        return "water_filtration_performance"
-    if any(w in text_lower for w in ["support", "customer service", "refund", "warranty"]):
-        return "customer_support"
-    if any(w in text_lower for w in ["install", "setup", "fitting", "mount"]):
-        return "installation_difficulty"
-    if any(w in text_lower for w in ["durable", "build quality", "lifetime", "robust"]):
-        return "product_durability"
-    if any(w in text_lower for w in ["feature", "release", "announce", "new", "launch"]):
+    # ── Enterprise Data Cloud & Storage ──────────────────────────
+    if any(w in text_lower for w in [
+        "enterprise data cloud", "data cloud", "hybrid cloud", "multi-cloud",
+        "data fabric", "data management", "unified storage",
+    ]):
+        return "enterprise_data_cloud"
+
+    if any(w in text_lower for w in [
+        "all-flash", "nvme", "nvme-of", "storage performance", "io latency",
+        "throughput", "iops", "storage efficiency", "data reduction",
+        "deduplication", "compression", "tiering", "storage class memory",
+        "scm", "qlc", "tlc", "hdd", "spinning disk",
+    ]):
+        return "storage_performance"
+
+    if any(w in text_lower for w in [
+        "data protection", "backup", "disaster recovery", "replication",
+        "snapshot", "clone", "restore", "rpo", "rto", "business continuity",
+        "high availability", "ha pair", "failover",
+    ]):
+        return "data_protection"
+
+    if any(w in text_lower for w in [
+        "security", "ransomware", "encryption", "immutable", "air-gap",
+        "zero trust", "compliance", "audit", "data governance", "gdpr",
+        "sox", "hipaa", "data sovereignty",
+    ]):
+        return "security_compliance"
+
+    # ── AI-Ready Infrastructure ──────────────────────────────────
+    if any(w in text_lower for w in [
+        "ai infrastructure", "ai-ready", "machine learning", "deep learning",
+        "llm", "large language model", "training", "inference", "gpu",
+        "hpc", "high performance computing", "data pipeline", "mlops",
+        "model training", "vector database", "embedding",
+    ]):
+        return "ai_ml_infrastructure"
+
+    # ── Cloud-Native Storage ─────────────────────────────────────
+    if any(w in text_lower for w in [
+        "cloud-native", "cloud native", "kubernetes", "k8s", "container",
+        "container storage", "csi", "container storage interface",
+        "persistent volume", "stateful workload", "operator", "helm",
+        "service mesh", "istio", "docker", "pod", "orchestration",
+    ]):
+        return "cloud_native_storage"
+
+    if any(w in text_lower for w in [
+        "devops", "ci/cd", "gitops", "infrastructure as code", "iac",
+        "terraform", "ansible", "pulumi", "automation", "sre",
+        "observability", "monitoring", "prometheus", "grafana",
+    ]):
+        return "devops_sre"
+
+    # ── Industry & Market ────────────────────────────────────────
+    if any(w in text_lower for w in [
+        "industry trend", "market share", "forecast", "gartner",
+        "idc", "forrester", "magic quadrant", "wave", "report",
+        "acquisition", "partnership", "funding", "series",
+    ]):
+        return "industry_analysis"
+
+    if any(w in text_lower for w in [
+        "open source", "open-source", "community", "contribution",
+        "cncf", "linux foundation", "foundation",
+    ]):
+        return "open_source_community"
+
+    # ── Product & Engineering ────────────────────────────────────
+    if any(w in text_lower for w in [
+        "release", "announce", "launch", "new feature", "roadmap",
+        "beta", "ga", "general availability", "version",
+    ]):
         return "product_release"
-    if any(w in text_lower for w in ["api", "sdk", "integration", "developer"]):
+
+    if any(w in text_lower for w in [
+        "engineering", "architecture", "design", "technical deep dive",
+        "how we built", "under the hood", "internals", "performance",
+    ]):
+        return "engineering_deep_dive"
+
+    if any(w in text_lower for w in [
+        "api", "sdk", "integration", "developer", "rest", "grpc",
+        "s3", "nfs", "smb", "iscsi", "protocol",
+    ]):
         return "developer_ecosystem"
-    if any(w in text_lower for w in ["industry", "trend", "market", "regulation"]):
-        return "industry_trends"
 
     # Fall back to configured hint if available
     if topic_hint:
@@ -149,7 +224,6 @@ def collect() -> list[dict]:
             print(f"[rss] ERROR: Feed '{feed_id}' unexpected error during fetch: {e}")
             continue
 
-        # Check for feedparser-level errors (bozo bit)
         if parsed.bozo and not parsed.entries:
             bozo_msg = getattr(parsed, "bozo_exception", "unknown parse error")
             print(f"[rss] WARNING: Feed '{feed_id}' returned no entries (bozo: {bozo_msg})")
