@@ -7,4 +7,5 @@ SOURCES = {
     "reddit": "scripts.sources.reddit",
     "discord": "scripts.sources.discord",
     "github_discussions": "scripts.sources.github_discussions",
+    "rss": "scripts.sources.rss_scraper",
 }

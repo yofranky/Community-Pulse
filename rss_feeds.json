@@ -1,0 +1,42 @@
+[
+  {
+    "id": "everpure_blog",
+    "name": "Everpure Blog",
+    "url": "https://www.everpure.com/blog/feed/",
+    "source_label": "blog",
+    "topic_hint": "product_news",
+    "priority": "high",
+    "max_entries_per_run": 10,
+    "rate_limit_seconds": 3600
+  },
+  {
+    "id": "everpure_github_releases",
+    "name": "Everpure GitHub Releases",
+    "url": "https://github.com/everpure/everpure/releases.atom",
+    "source_label": "github_releases",
+    "topic_hint": "product_release",
+    "priority": "high",
+    "max_entries_per_run": 20,
+    "rate_limit_seconds": 3600
+  },
+  {
+    "id": "water_quality_industry",
+    "name": "Water Quality & Tech News",
+    "url": "https://example-water-rss.com/feed.xml",
+    "source_label": "industry_news",
+    "topic_hint": "industry_trends",
+    "priority": "medium",
+    "max_entries_per_run": 20,
+    "rate_limit_seconds": 86400
+  },
+  {
+    "id": "hacker_news_water",
+    "name": "HN: Water Filtration",
+    "url": "https://hnrss.org/frontpage?q=water+filtration+everpure",
+    "source_label": "industry_news",
+    "topic_hint": "industry_trends",
+    "priority": "low",
+    "max_entries_per_run": 5,
+    "rate_limit_seconds": 86400
+  }
+]
