@@ -22,8 +22,11 @@ import sys
 
 # Files to inline into the HTML
 FILES_TO_INLINE = {
+    "app/__init__.py": "app/__init__.py",
     "app/app.py": "app/app.py",
+    "app/utils/__init__.py": "app/utils/__init__.py",
     "app/utils/data_loader.py": "app/utils/data_loader.py",
+    "app/components/__init__.py": "app/components/__init__.py",
     "app/components/dashboard.py": "app/components/dashboard.py",
     "app/components/timeline.py": "app/components/timeline.py",
     "app/components/signal_table.py": "app/components/signal_table.py",
