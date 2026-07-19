@@ -29,7 +29,7 @@ from app.utils.data_loader import (
 
 # ── Page Configuration ──────────────────────────────────────────────
 st.set_page_config(
-    page_title="Community Pulse - Everpure",
+    page_title="Community Pulse — Enterprise Storage Intelligence",
     page_icon="📊",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -185,7 +185,7 @@ with st.sidebar:
 st.title("📊 Community Pulse")
 st.markdown(
     '<p style="color:#6B7280; font-size:16px; margin-top:-8px;">'
-    "Real-time community sentiment & competitive intelligence for Everpure"
+    "Enterprise storage intelligence — competitor watch, community sentiment, and migration signals"
     "</p>",
     unsafe_allow_html=True,
 )

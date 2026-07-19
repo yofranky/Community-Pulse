@@ -65,7 +65,7 @@ def build_site():
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Community Pulse - Everpure</title>
+  <title>Community Pulse — Enterprise Storage Intelligence</title>
   <style>
     body {{ margin: 0; padding: 0; background: #F9FAFB; }}
     #root {{ width: 100vw; height: 100vh; }}
