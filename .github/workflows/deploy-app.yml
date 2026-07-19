@@ -6,6 +6,8 @@ on:
     paths:
       - "app/**"
       - "data/**"
+      - ".github/workflows/deploy-app.yml"
+      - "scripts/build_stlite_site.py"
   workflow_dispatch:
 
 permissions:
