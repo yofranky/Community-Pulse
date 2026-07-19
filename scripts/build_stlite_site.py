@@ -27,7 +27,7 @@ FILES_TO_INLINE = {
     "data/data.json": "data/data.json",
 }
 
-STLITE_CDN_URL = "https://cdn.jsdelivr.net/npm/@stlite/browser@1.8.1/umd/stlite.js"
+STLITE_CDN_URL = "https://cdn.jsdelivr.net/npm/@stlite/browser@1.8.1/build/stlite.js"
 
 
 def escape_for_js_template(text: str) -> str:
@@ -75,12 +75,19 @@ def build_site():
 <body>
   <div id="root"></div>
   <script>
-    stlite.mount({{
-      entrypoint: "app/app.py",
-      files: {{
+    function initStlite() {{
+      if (typeof stlite === "undefined") {{
+        setTimeout(initStlite, 100);
+        return;
+      }}
+      stlite.mount({{
+        entrypoint: "app/app.py",
+        files: {{
 {files_js}
-      }},
-    }}, document.getElementById("root"));
+        }},
+      }}, document.getElementById("root"));
+    }}
+    initStlite();
   </script>
 </body>
 </html>
