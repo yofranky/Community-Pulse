@@ -43,7 +43,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r scripts/requirements.txt
 
-<<<<<<< HEAD
       - name: Install Ollama for SLM inference
         run: |
           curl -fsSL https://ollama.com/install.sh | sh
@@ -54,8 +53,6 @@ jobs:
           # Verify model is loaded
           ollama list | grep phi3.5 || echo "Model check done"
 
-=======
->>>>>>> 7aa848706d4620cefaa2750ef34e3fe3d9b4aab9
       - name: Run ETL collection
         env:
           REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
