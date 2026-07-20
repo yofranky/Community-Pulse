@@ -104,6 +104,14 @@ SOURCE_BIAS_MAP: dict[str, int] = {
     "dell_infohub": 1,
 }
 
+# ── Author Anonymization ────────────────────────────────────────────
+# All author names are irreversibly hashed using SHA-256 to:
+# 1. Preserve privacy (no PII stored in the repo)
+# 2. Enable author tracking (same person = same hash across signals)
+#    so we can detect repeat positive/negative contributors
+# 3. Use a fixed salt to prevent rainbow table attacks
+AUTHOR_HASH_SALT = "community-pulse-v1"
+
 
 def content_fingerprint(text: str) -> str:
     """
@@ -463,6 +471,16 @@ def normalize_signal(raw: dict, source: str) -> dict | None:
     if isinstance(date_str, (int, float)):
         date_str = datetime.fromtimestamp(date_str, tz=timezone.utc).isoformat()
 
+    # Hash the author name (privacy-by-design, preserves tracking)
+    raw_author = raw.get("author", "anonymous")
+    if raw_author and raw_author != "anonymous":
+        hashed = hashlib.sha256(
+            f"{AUTHOR_HASH_SALT}:{raw_author}".encode()
+        ).hexdigest()[:16]
+        author = f"usr_{hashed}"
+    else:
+        author = "anonymous"
+
     return {
         "id": signal_id,
         "source": source,
@@ -471,7 +489,7 @@ def normalize_signal(raw: dict, source: str) -> dict | None:
         "topic": raw.get("topic", "general"),
         "sentiment_score": max(-1.0, min(1.0, sentiment)),
         "confidence": max(0.0, min(1.0, confidence if confidence is not None else 0.5)),
-        "author": raw.get("author", "anonymous"),
+        "author": author,
         "content_preview": content[:500],
         "engagement": {
             "likes": raw.get("engagement", {}).get("likes", 0),
