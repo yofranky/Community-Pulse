@@ -1,0 +1,122 @@
+[
+  {
+    "id": "everpure_blog",
+    "name": "Everpure Official Blog",
+    "url": "https://blog.everpuredata.com/feed",
+    "source_label": "blog",
+    "topic_hint": "product_news",
+    "category": "own_brand",
+    "source_bias": 0,
+    "priority": "high",
+    "max_entries_per_run": 10,
+    "rate_limit_seconds": 3600
+  },
+  {
+    "id": "everpure_tech",
+    "name": "Everpure Engineering Blog",
+    "url": "https://blog.everpuredata.com/engineering/feed",
+    "source_label": "engineering",
+    "topic_hint": "engineering",
+    "category": "own_brand",
+    "source_bias": 0,
+    "priority": "high",
+    "max_entries_per_run": 15,
+    "rate_limit_seconds": 3600
+  },
+  {
+    "id": "storage_news",
+    "name": "StorageNewsletter",
+    "url": "https://www.storagenewsletter.com/feed/",
+    "source_label": "industry_news",
+    "topic_hint": "industry_trends",
+    "category": "industry",
+    "source_bias": 0,
+    "priority": "high",
+    "max_entries_per_run": 20,
+    "rate_limit_seconds": 21600
+  },
+  {
+    "id": "cloud_native",
+    "name": "Cloud Native Daily",
+    "url": "https://cloudnativedaily.com/feed/",
+    "source_label": "cloud_native",
+    "topic_hint": "cloud_native",
+    "category": "industry",
+    "source_bias": 0,
+    "priority": "medium",
+    "max_entries_per_run": 15,
+    "rate_limit_seconds": 43200
+  },
+  {
+    "id": "ai_infrastructure",
+    "name": "AI Infrastructure Alliance",
+    "url": "https://ai-infrastructure.org/feed/",
+    "source_label": "ai_ops",
+    "topic_hint": "ai_ml",
+    "category": "industry",
+    "source_bias": 0,
+    "priority": "medium",
+    "max_entries_per_run": 15,
+    "rate_limit_seconds": 43200
+  },
+  {
+    "id": "kubernetes_io",
+    "name": "Kubernetes Blog",
+    "url": "https://kubernetes.io/feed.xml",
+    "source_label": "devops",
+    "topic_hint": "devops",
+    "category": "industry",
+    "source_bias": 0,
+    "priority": "medium",
+    "max_entries_per_run": 10,
+    "rate_limit_seconds": 43200
+  },
+  {
+    "id": "netapp_community",
+    "name": "NetApp Tech ONTAP",
+    "url": "https://community.netapp.com/t5/Blogs/ct-p/netapp-blogs/rss",
+    "source_label": "netapp_community",
+    "topic_hint": "competitor_news",
+    "category": "competitor",
+    "source_bias": 1,
+    "priority": "high",
+    "max_entries_per_run": 15,
+    "rate_limit_seconds": 21600
+  },
+  {
+    "id": "dell_infohub",
+    "name": "Dell Info Hub",
+    "url": "https://infohub.delltechnologies.com/t/blogs-68/rss",
+    "source_label": "dell_infohub",
+    "topic_hint": "competitor_news",
+    "category": "competitor",
+    "source_bias": 1,
+    "priority": "high",
+    "max_entries_per_run": 15,
+    "rate_limit_seconds": 21600
+  },
+  {
+    "id": "reddit_sysadmin",
+    "name": "r/sysadmin",
+    "url": "https://www.reddit.com/r/sysadmin/.rss",
+    "source_label": "reddit",
+    "topic_hint": "community_discussion",
+    "category": "community",
+    "source_bias": 0,
+    "priority": "high",
+    "max_entries_per_run": 40,
+    "rate_limit_seconds": 600
+  },
+  {
+    "id": "reddit_storage",
+    "name": "r/storage",
+    "url": "https://www.reddit.com/r/storage/.rss",
+    "source_label": "reddit",
+    "topic_hint": "community_discussion",
+    "category": "community",
+    "source_bias": 0,
+    "priority": "high",
+    "max_entries_per_run": 40,
+    "rate_limit_seconds": 600
+  }
+]

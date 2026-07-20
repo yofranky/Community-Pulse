@@ -1,0 +1,1 @@
+# Community Pulse app components package

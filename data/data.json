@@ -1,0 +1,193 @@
+{
+  "meta": {
+    "version": 3,
+    "last_updated": "2026-07-19T21:25:00Z",
+    "total_signals": 11,
+    "sources_aggregated": ["blog", "engineering", "industry_news", "cloud_native", "ai_ops", "netapp_community", "dell_infohub", "reddit"]
+  },
+  "signals": [
+    {
+      "id": "sig_a1b2c3d4",
+      "source": "engineering",
+      "source_url": "https://blog.everpuredata.com/engineering/nvme-of-performance",
+      "date": "2026-07-19T14:00:00Z",
+      "topic": "storage_performance",
+      "sentiment_score": 0.85,
+      "confidence": 0.90,
+      "author": "everpure_eng",
+      "content_preview": "In this post we explore NVMe over Fabrics performance characteristics for all-flash arrays. Our QLC-based systems achieve 2 million IOPS with sub-100 microsecond latency, representing a 3x improvement over the previous generation.",
+      "engagement": { "likes": 127, "replies": 34, "shares": 45 },
+      "tags": ["nvme_over_fabrics", "all_flash", "qlc_nand", "io_per_second", "engineering_deep_dive"]
+    },
+    {
+      "id": "sig_b2c3d4e5",
+      "source": "blog",
+      "source_url": "https://blog.everpuredata.com/enterprise-data-cloud-launch",
+      "date": "2026-07-18T09:00:00Z",
+      "topic": "enterprise_data_cloud",
+      "sentiment_score": 0.70,
+      "confidence": 0.85,
+      "author": "everpure_marketing",
+      "content_preview": "Introducing the Everpure Enterprise Data Cloud: a unified data management platform that spans hybrid and multi-cloud environments. Built for AI-ready infrastructure with native Kubernetes integration.",
+      "engagement": { "likes": 89, "replies": 22, "shares": 67 },
+      "tags": ["enterprise_data_cloud", "hybrid_cloud", "ai_ml_infrastructure", "kubernetes", "product_release"]
+    },
+    {
+      "id": "sig_c3d4e5f6",
+      "source": "industry_news",
+      "source_url": "https://www.storagenewsletter.com/everpure-gartner-magic-quadrant",
+      "date": "2026-07-17T12:30:00Z",
+      "topic": "industry_analysis",
+      "sentiment_score": 0.60,
+      "confidence": 0.80,
+      "author": "storage_news",
+      "content_preview": "Everpure positioned as a Leader in the Gartner Magic Quadrant for Primary Storage. The report highlights Everpure's strong focus on AI-ready infrastructure and cloud-native storage solutions as key differentiators in the enterprise market.",
+      "engagement": { "likes": 210, "replies": 45, "shares": 89 },
+      "tags": ["industry_analysis", "gartner", "magic_quadrant", "enterprise_data_cloud"]
+    },
+    {
+      "id": "sig_d4e5f6g7",
+      "source": "cloud_native",
+      "source_url": "https://cloudnativedaily.com/csi-driver-ga",
+      "date": "2026-07-17T08:00:00Z",
+      "topic": "cloud_native_storage",
+      "sentiment_score": 0.75,
+      "confidence": 0.85,
+      "author": "cloud_native_daily",
+      "content_preview": "The Container Storage Interface driver for Everpure enterprise storage has reached general availability, enabling stateful workloads on Kubernetes with persistent storage that scales to petabyte级别.",
+      "engagement": { "likes": 156, "replies": 28, "shares": 52 },
+      "tags": ["container_storage_interface", "kubernetes", "general_availability", "cloud_native_storage"]
+    },
+    {
+      "id": "sig_e5f6g7h8",
+      "source": "industry_news",
+      "source_url": "https://www.storagenewsletter.com/ransomware-protection-report",
+      "date": "2026-07-16T15:45:00Z",
+      "topic": "security_compliance",
+      "sentiment_score": 0.45,
+      "confidence": 0.75,
+      "author": "storage_news",
+      "content_preview": "New report shows 78% of enterprises are prioritizing immutable storage and air-gapped backup solutions for ransomware protection. Everpure's recently announced SafeMode immutability feature aligns with this trend.",
+      "engagement": { "likes": 93, "replies": 18, "shares": 34 },
+      "tags": ["security_compliance", "ransomware", "data_protection", "immutable_storage"]
+    },
+    {
+      "id": "sig_f6g7h8i9",
+      "source": "ai_ops",
+      "source_url": "https://ai-infrastructure.org/ai-training-data-pipelines",
+      "date": "2026-07-16T10:00:00Z",
+      "topic": "ai_ml_infrastructure",
+      "sentiment_score": 0.65,
+      "confidence": 0.80,
+      "author": "ai_infra_alliance",
+      "content_preview": "Building efficient data pipelines for large language model training requires storage infrastructure that can sustain high-throughput reads with low latency. We examine how parallel filesystems and object storage are evolving to meet AI workload demands.",
+      "engagement": { "likes": 178, "replies": 42, "shares": 61 },
+      "tags": ["ai_ml_infrastructure", "large_language_model", "data_pipeline", "high_performance_computing"]
+    },
+    {
+      "id": "sig_g7h8i9j0",
+      "source": "engineering",
+      "source_url": "https://blog.everpuredata.com/engineering/kubernetes-operator-deep-dive",
+      "date": "2026-07-15T11:00:00Z",
+      "topic": "devops_sre",
+      "sentiment_score": 0.80,
+      "confidence": 0.88,
+      "author": "everpure_eng",
+      "content_preview": "How we built the Everpure Kubernetes Operator to manage persistent storage at scale. Using a custom controller with Kubernetes CSI and operator pattern to automate storage provisioning, snapshotting, and disaster recovery.",
+      "engagement": { "likes": 145, "replies": 31, "shares": 48 },
+      "tags": ["kubernetes", "devops_sre", "container_storage_interface", "disaster_recovery", "engineering_deep_dive"]
+    },
+    {
+      "id": "sig_h8i9j0k1",
+      "source": "cloud_native",
+      "source_url": "https://cloudnativedaily.com/stateful-workloads-best-practices",
+      "date": "2026-07-14T09:30:00Z",
+      "topic": "cloud_native_storage",
+      "sentiment_score": 0.55,
+      "confidence": 0.78,
+      "author": "cloud_native_daily",
+      "content_preview": "Best practices for running stateful workloads on Kubernetes: persistent volume claims, storage classes, and backup strategies. Includes benchmarks for database workloads on various CSI driver implementations.",
+      "engagement": { "likes": 112, "replies": 27, "shares": 38 },
+      "tags": ["cloud_native_storage", "kubernetes", "persistent_volume", "stateful_workload"]
+    },
+    {
+      "id": "sig_i9j0k1l2",
+      "source": "netapp_community",
+      "source_url": "https://community.netapp.com/t5/Blogs/netapp-ontap-leader-2026/ct-p/netapp-blogs",
+      "date": "2026-07-19T11:00:00Z",
+      "topic": "competitor_news",
+      "sentiment_score": 0.72,
+      "confidence": 0.82,
+      "author": "netapp_blog",
+      "content_preview": "NetApp ONTAP recognized as a leader in enterprise storage for the seventh consecutive year. The latest release delivers groundbreaking performance improvements for hybrid cloud deployments and AI workloads.",
+      "engagement": { "likes": 88, "replies": 12, "shares": 34 },
+      "tags": ["netapp", "competitor_news", "industry_analysis", "hybrid_cloud"],
+      "competitor_intel": {
+        "alert_level": 3,
+        "classification": "threat",
+        "entities_detected": ["netapp"],
+        "signal_text": "netapp ontap recognized as a leader in enterprise storage for the seventh consecutive year. the latest release delivers groundbreaking performance"
+      }
+    },
+    {
+      "id": "sig_j0k1l2m3",
+      "source": "reddit",
+      "source_url": "https://www.reddit.com/r/sysadmin/comments/everpure_vs_dell",
+      "date": "2026-07-18T16:20:00Z",
+      "topic": "community_discussion",
+      "sentiment_score": 0.30,
+      "confidence": 0.70,
+      "author": "sysadmin_user",
+      "content_preview": "Anyone else considering migrating from Dell PowerStore to Everpure? We're tired of the licensing complexity and the support has been inconsistent. Looking at Everpure's all-flash line as an alternative.",
+      "engagement": { "likes": 45, "replies": 23, "shares": 7 },
+      "tags": ["community_discussion", "dell", "everpure", "migration"],
+      "competitor_intel": {
+        "alert_level": 2,
+        "classification": "opportunity",
+        "entities_detected": ["dell", "everpure"],
+        "signal_text": "anyone else considering migrating from dell powerstore to everpure? we're tired of the licensing complexity and the support has been"
+      }
+    },
+    {
+      "id": "sig_k1l2m3n4",
+      "source": "dell_infohub",
+      "source_url": "https://infohub.delltechnologies.com/t/powerstore-next-gen-announcement/rss",
+      "date": "2026-07-17T14:00:00Z",
+      "topic": "competitor_news",
+      "sentiment_score": 0.60,
+      "confidence": 0.78,
+      "author": "dell_tech",
+      "content_preview": "Introducing the next generation of Dell PowerStore: a new architecture that delivers up to 40% better performance than previous generations. Purpose-built for modern data centers with integrated AIOps capabilities.",
+      "engagement": { "likes": 67, "replies": 15, "shares": 22 },
+      "tags": ["dell", "competitor_news", "storage_performance", "product_release"],
+      "competitor_intel": {
+        "alert_level": 3,
+        "classification": "threat",
+        "entities_detected": ["dell"],
+        "signal_text": "introducing the next generation of dell powerstore: a new architecture that delivers up to 40% better performance than previous generations"
+      }
+    }
+  ],
+  "summary": {
+    "overall_sentiment": 0.64,
+    "top_topics": [
+      { "topic": "cloud_native_storage", "count": 2, "avg_sentiment": 0.65 },
+      { "topic": "competitor_news", "count": 2, "avg_sentiment": 0.66 },
+      { "topic": "storage_performance", "count": 1, "avg_sentiment": 0.85 },
+      { "topic": "enterprise_data_cloud", "count": 1, "avg_sentiment": 0.70 },
+      { "topic": "industry_analysis", "count": 1, "avg_sentiment": 0.60 },
+      { "topic": "security_compliance", "count": 1, "avg_sentiment": 0.45 },
+      { "topic": "ai_ml_infrastructure", "count": 1, "avg_sentiment": 0.65 },
+      { "topic": "devops_sre", "count": 1, "avg_sentiment": 0.80 },
+      { "topic": "community_discussion", "count": 1, "avg_sentiment": 0.30 }
+    ],
+    "sentiment_trend": [
+      { "date": "2026-07-14", "avg_sentiment": 0.55, "signal_count": 1 },
+      { "date": "2026-07-15", "avg_sentiment": 0.80, "signal_count": 1 },
+      { "date": "2026-07-16", "avg_sentiment": 0.55, "signal_count": 2 },
+      { "date": "2026-07-17", "avg_sentiment": 0.65, "signal_count": 3 },
+      { "date": "2026-07-18", "avg_sentiment": 0.50, "signal_count": 2 },
+      { "date": "2026-07-19", "avg_sentiment": 0.79, "signal_count": 2 }
+    ]
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Community Pulse Signal Schema",
+  "description": "Schema for community sentiment signals collected from Everpure community sources",
+  "type": "object",
+  "required": ["meta", "signals", "summary"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["version", "last_updated", "total_signals", "sources_aggregated"],
+      "properties": {
+        "version": { "type": "integer", "minimum": 1 },
+        "last_updated": { "type": "string", "format": "date-time" },
+        "total_signals": { "type": "integer", "minimum": 0 },
+        "sources_aggregated": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["reddit", "discord", "github_discussions", "blog", "github_releases", "industry_news", "engineering", "cloud_native", "ai_ops", "devops", "netapp_community", "dell_infohub"] }
+        }
+      }
+    },
+    "signals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "source", "date", "topic", "sentiment_score"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^sig_[a-f0-9]+$" },
+          "source": { "type": "string", "enum": ["reddit", "discord", "github_discussions", "blog", "github_releases", "industry_news", "engineering", "cloud_native", "ai_ops", "devops", "netapp_community", "dell_infohub"] },
+          "source_url": { "type": "string", "format": "uri" },
+          "date": { "type": "string", "format": "date-time" },
+          "topic": { "type": "string", "minLength": 1 },
+          "sentiment_score": { "type": "number", "minimum": -1.0, "maximum": 1.0 },
+          "confidence": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+          "author": { "type": "string" },
+          "content_preview": { "type": "string", "maxLength": 500 },
+          "engagement": {
+            "type": "object",
+            "properties": {
+              "likes": { "type": "integer", "minimum": 0 },
+              "replies": { "type": "integer", "minimum": 0 },
+              "shares": { "type": "integer", "minimum": 0 }
+            }
+          },
+          "tags": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "competitor_intel": {
+            "type": "object",
+            "required": ["alert_level", "classification", "entities_detected"],
+            "properties": {
+              "alert_level": { "type": "integer", "minimum": 1, "maximum": 3 },
+              "classification": { "type": "string", "enum": ["neutral", "opportunity", "threat"] },
+              "entities_detected": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "signal_text": { "type": "string", "maxLength": 200 }
+            }
+          }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": ["overall_sentiment", "top_topics", "sentiment_trend"],
+      "properties": {
+        "overall_sentiment": { "type": "number", "minimum": -1.0, "maximum": 1.0 },
+        "top_topics": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["topic", "count", "avg_sentiment"],
+            "properties": {
+              "topic": { "type": "string" },
+              "count": { "type": "integer", "minimum": 0 },
+              "avg_sentiment": { "type": "number", "minimum": -1.0, "maximum": 1.0 }
+            }
+          }
+        },
+        "sentiment_trend": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["date", "avg_sentiment", "signal_count"],
+            "properties": {
+              "date": { "type": "string", "format": "date" },
+              "avg_sentiment": { "type": "number", "minimum": -1.0, "maximum": 1.0 },
+              "signal_count": { "type": "integer", "minimum": 0 }
+            }
+          }
+        }
+      }
+    }
+  }
+}

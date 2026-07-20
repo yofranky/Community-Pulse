@@ -1,0 +1,18 @@
+# Community Pulse - ETL Dependencies
+# Core
+requests>=2.31.0
+jsonschema>=4.20.0
+
+# Sentiment Analysis
+textblob>=0.17.1
+
+# Data Processing
+python-dateutil>=2.8.2
+
+# RSS Feed Parsing
+feedparser>=6.0.11
+
+# Source-specific (uncomment when implementing)
+# praw>=7.7.0          # Reddit API
+# discord.py>=2.3.0    # Discord bot
+# PyGithub>=2.1.0      # GitHub API
