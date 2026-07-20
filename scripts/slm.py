@@ -13,10 +13,12 @@ Privacy: No PII is sent to the model. Content is truncated to 500 chars
 before inference. All processing stays local (Ollama runs on the same machine).
 """
 
+from __future__ import annotations
+
 import json
 import os
 import re
-from typing import Any
+from typing import Any, Optional
 
 import requests
 
@@ -47,7 +49,7 @@ def _check_ollama_available() -> bool:
         return False
 
 
-def _call_ollama(prompt: str, system_prompt: str | None = None) -> str | None:
+def _call_ollama(prompt: str, system_prompt: Optional[str] = None) -> Optional[str]:
     """Call Ollama's generate API with a prompt. Returns the response text or None."""
     payload: dict[str, Any] = {
         "model": OLLAMA_MODEL,
@@ -263,7 +265,7 @@ TOPIC_SYSTEM_PROMPT = (
 )
 
 
-def infer_topic(text: str, topic_hint: str | None = None) -> str:
+def infer_topic(text: str, topic_hint: Optional[str] = None) -> str:
     """
     Infer the topic of a text using the SLM.
 

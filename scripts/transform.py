@@ -10,10 +10,12 @@ Includes a 'cleaner' function to:
 - Normalize technical jargon from enterprise storage / data infrastructure sources
 """
 
+from __future__ import annotations
+
 import hashlib
 import json
 import re
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 from scripts.slm import analyze_sentiment, classify_competitor_intel, infer_topic as slm_infer_topic
@@ -258,6 +260,58 @@ def clean_signals(raw_signals: dict[str, list[dict]]) -> dict[str, list[dict]]:
         cleaned[source] = title_deduped
 
     return cleaned
+
+
+# ── Data Retention (30-day pruning) ────────────────────────────────
+# Signals older than this threshold are rotated out to ensure relevance
+# and minimize data footprint (privacy-by-design policy).
+DATA_RETENTION_DAYS = 30
+
+
+def prune_old_signals(signals: list[dict], max_age_days: int = DATA_RETENTION_DAYS) -> list[dict]:
+    """
+    Remove signals older than max_age_days from the current time.
+
+    This implements the 30-day data rotation policy:
+    - Signals older than 30 days are pruned
+    - The pruning timestamp is logged so the audit trail is clear
+    - Only signals with a valid date field are considered
+
+    Args:
+        signals: List of normalized signal dicts
+        max_age_days: Maximum age in days before pruning (default 30)
+
+    Returns:
+        Pruned list of signals (younger than max_age_days)
+    """
+    if not signals:
+        return signals
+
+    now = datetime.now(timezone.utc)
+    cutoff = now - timedelta(days=max_age_days)
+    kept = []
+    pruned_count = 0
+
+    for s in signals:
+        date_str = s.get("date", "")
+        if not date_str:
+            # Keep signals without dates (don't prune what we can't evaluate)
+            kept.append(s)
+            continue
+        try:
+            signal_date = datetime.fromisoformat(date_str.replace("Z", "+00:00"))
+            if signal_date >= cutoff:
+                kept.append(s)
+            else:
+                pruned_count += 1
+        except (ValueError, TypeError):
+            kept.append(s)
+
+    if pruned_count > 0:
+        print(f"[retention] Pruned {pruned_count} signals older than {max_age_days} days "
+              f"(cutoff: {cutoff.strftime('%Y-%m-%d')})")
+
+    return kept
 
 
 # ── Competitor Watch ───────────────────────────────────────────────
@@ -575,8 +629,9 @@ def transform(
                         print(f"[intel] Why: {intel['explanation']}")
                 normalized.append(signal)
 
-    # Step 3: Merge with existing signals if provided (dedup by ID)
+    # Step 3: Prune old signals from existing data (30-day retention policy)
     if existing_data and "signals" in existing_data:
+        existing_data["signals"] = prune_old_signals(existing_data["signals"])
         existing_ids = {s["id"] for s in normalized}
         for s in existing_data["signals"]:
             if s["id"] not in existing_ids:
