@@ -254,6 +254,7 @@ with st.expander("View all signals", expanded=False):
                 "replies",
                 "alert_level",
                 "classification",
+                "explanation",
             ]
         ].sort_values("date", ascending=False)
         display_df["date"] = display_df["date"].dt.strftime("%Y-%m-%d %H:%M")
@@ -273,6 +274,7 @@ with st.expander("View all signals", expanded=False):
                     "replies": "Replies",
                     "alert_level": "Alert Level",
                     "classification": "Classification",
+                    "explanation": "Why?",
                 }
             ),
             use_container_width=True,

@@ -47,6 +47,7 @@ def signals_to_dataframe(data: dict) -> pd.DataFrame:
                 "classification": ci.get("classification", "neutral"),
                 "entities_detected": ", ".join(ci.get("entities_detected", [])),
                 "signal_text": ci.get("signal_text", ""),
+                "explanation": ci.get("explanation", ""),
             }
         )
     df = pd.DataFrame(records)

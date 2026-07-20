@@ -126,6 +126,7 @@
         "alert_level": 3,
         "classification": "threat",
         "entities_detected": ["netapp"],
+        "explanation": "NetApp ONTAP praised as a leader for the seventh consecutive year with 'groundbreaking' performance improvements — this is a threat signal as it strengthens a direct competitor's market position.",
         "signal_text": "netapp ontap recognized as a leader in enterprise storage for the seventh consecutive year. the latest release delivers groundbreaking performance"
       }
     },
@@ -145,6 +146,7 @@
         "alert_level": 2,
         "classification": "opportunity",
         "entities_detected": ["dell", "everpure"],
+        "explanation": "User explicitly inquiring about migrating from Dell PowerStore to Everpure due to licensing frustration and inconsistent support — this is a direct migration opportunity signal.",
         "signal_text": "anyone else considering migrating from dell powerstore to everpure? we're tired of the licensing complexity and the support has been"
       }
     },
@@ -164,6 +166,7 @@
         "alert_level": 3,
         "classification": "threat",
         "entities_detected": ["dell"],
+        "explanation": "Dell announces next-gen PowerStore with 40% performance improvement and integrated AIOps — this is a threat as it strengthens a primary competitor's product lineup.",
         "signal_text": "introducing the next generation of dell powerstore: a new architecture that delivers up to 40% better performance than previous generations"
       }
     }

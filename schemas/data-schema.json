@@ -47,7 +47,7 @@
           },
           "competitor_intel": {
             "type": "object",
-            "required": ["alert_level", "classification", "entities_detected"],
+            "required": ["alert_level", "classification", "entities_detected", "explanation"],
             "properties": {
               "alert_level": { "type": "integer", "minimum": 1, "maximum": 3 },
               "classification": { "type": "string", "enum": ["neutral", "opportunity", "threat"] },
@@ -55,6 +55,7 @@
                 "type": "array",
                 "items": { "type": "string" }
               },
+              "explanation": { "type": "string", "maxLength": 500, "description": "SLM-generated explanation of why this classification was made. Provides audit trail for Threat/Opportunity decisions." },
               "signal_text": { "type": "string", "maxLength": 200 }
             }
           }

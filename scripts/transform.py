@@ -16,7 +16,7 @@ import re
 from datetime import datetime, timezone
 from typing import Any
 
-from textblob import TextBlob
+from scripts.slm import analyze_sentiment, classify_competitor_intel, infer_topic as slm_infer_topic
 
 
 # ── Jargon Normalization Map ───────────────────────────────────────
@@ -399,9 +399,10 @@ def normalize_signal(raw: dict, source: str) -> dict | None:
     sentiment = raw.get("sentiment_score")
     confidence = raw.get("confidence")
     if sentiment is None:
-        blob = TextBlob(content)
-        sentiment = round(blob.sentiment.polarity, 4)
-        confidence = round(blob.sentiment.subjectivity, 4)
+        # Use SLM for sentiment analysis (falls back to keyword-based if unavailable)
+        slm_result = analyze_sentiment(content)
+        sentiment = slm_result["sentiment_score"]
+        confidence = slm_result["confidence"]
 
     # Parse / normalize date
     date_str = raw.get("date", "")
@@ -554,8 +555,8 @@ def transform(
 
                 seen_fingerprints[fingerprint] = (signal_date, source)
 
-                # ── Competitor watch with source bias ───────────────
-                intel = competitor_watch(content, title)
+                # ── Competitor watch with SLM (includes explanation) ──
+                intel = classify_competitor_intel(content, title)
                 if intel["alert_level"] > 1:
                     # Apply source bias penalty: competitor-owned channels
                     # get +1 to alert_level (their self-praise is expected)
@@ -570,6 +571,8 @@ def transform(
                     signal["competitor_intel"] = intel
                     print(f"[intel] {intel['classification'].upper()}: "
                           f"{intel['entities_detected']} (level {intel['alert_level']})")
+                    if intel.get("explanation"):
+                        print(f"[intel] Why: {intel['explanation']}")
                 normalized.append(signal)
 
     # Step 3: Merge with existing signals if provided (dedup by ID)
