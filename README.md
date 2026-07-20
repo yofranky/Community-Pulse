@@ -1,77 +1,89 @@
 # Community Pulse — Everpure
 
-A serverless community sentiment monitoring system for Everpure. Collects signals from Reddit, Discord, and GitHub Discussions, runs sentiment analysis, and visualizes the results in a browser-based dashboard — all with no backend servers.
+A serverless community intelligence pipeline for enterprise storage. Collects signals from RSS feeds, Reddit, Discord, and GitHub Discussions, runs SLM-powered sentiment analysis and competitor classification, and visualizes the results in a browser-based dashboard — all with no backend servers.
 
 ## Architecture
 
 ```
-┌─────────────────┐     ┌──────────────────┐     ┌──────────────────┐
-│   Reddit API    │     │   Discord API    │     │  GitHub API      │
-│   (PRAW)        │     │   (discord.py)   │     │  (PyGithub)      │
-└────────┬────────┘     └────────┬─────────┘     └────────┬─────────┘
-         │                       │                        │
-         ▼                       ▼                        ▼
-┌───────────────────────────────────────────────────────────────────┐
-│                    scripts/collect.py (Orchestrator)               │
-│                                                                   │
-│   ┌──────────┐  ┌──────────┐  ┌──────────────────┐               │
-│   │ reddit   │  │ discord  │  │ github_discussions│               │
-│   │ .collect()│  │ .collect()│  │ .collect()       │               │
-│   └──────────┘  └──────────┘  └──────────────────┘               │
-└──────────────────────────┬────────────────────────────────────────┘
-                           │
-                           ▼
-┌───────────────────────────────────────────────────────────────────┐
-│                    scripts/transform.py                            │
-│   • Normalize signals to standard schema                          │
-│   • Compute sentiment scores (TextBlob)                           │
-│   • Generate summary rollups (top topics, trend)                  │
-└──────────────────────────┬────────────────────────────────────────┘
-                           │
-                           ▼
-┌───────────────────────────────────────────────────────────────────┐
-│                    data/data.json                                  │
-│   • Single source-of-truth artifact                               │
-│   • Committed to repo (data-as-code)                              │
-│   • Validated against schemas/data-schema.json                    │
-└──────────────────────────┬────────────────────────────────────────┘
-                           │
-                           ▼
-┌───────────────────────────────────────────────────────────────────┐
-│                    app/ (Stlite Frontend)                          │
-│   • Streamlit dashboard running in the browser (no server)        │
-│   • Deployed to GitHub Pages                                      │
-│   • Reads data.json directly                                      │
-└───────────────────────────────────────────────────────────────────┘
+┌─────────────────┐     ┌──────────────────┐     ┌──────────────────┐     ┌──────────────────────┐
+│   RSS Feeds     │     │   Reddit API     │     │   Discord API    │     │  GitHub API          │
+│   (feedparser)  │     │   (PRAW)         │     │   (discord.py)   │     │  (PyGithub)          │
+└────────┬────────┘     └────────┬─────────┘     └────────┬─────────┘     └────────┬─────────────┘
+         │                       │                        │                        │
+         ▼                       ▼                        ▼                        ▼
+┌──────────────────────────────────────────────────────────────────────────────────────────────┐
+│                          scripts/collect.py (Orchestrator)                                    │
+│                                                                                              │
+│   ┌──────────┐  ┌──────────┐  ┌──────────────────┐  ┌──────────────┐                       │
+│   │  rss     │  │ reddit   │  │    discord       │  │ github_      │                       │
+│   │ .collect()│  │ .collect()│  │  .collect()     │  │ discussions  │                       │
+│   └──────────┘  └──────────┘  └──────────────────┘  │ .collect()   │                       │
+│                                                      └──────────────┘                       │
+└──────────────────────────────────┬───────────────────────────────────────────────────────────┘
+                                   │
+                                   ▼
+┌──────────────────────────────────────────────────────────────────────────────────────────────┐
+│                          scripts/transform.py                                                 │
+│   • Clean signals (boilerplate removal, dedup, jargon normalization)                         │
+│   • Anonymize authors (SHA-256 hashing — privacy-by-design)                                  │
+│   • SLM sentiment analysis (Phi-3.5 via Ollama, falls back to keyword-based)                 │
+│   • Competitor intelligence with explanation (Threat/Opportunity/Neutral)                    │
+│   • 30-day data retention pruning                                                           │
+└──────────────────────────────────┬───────────────────────────────────────────────────────────┘
+                                   │
+                                   ▼
+┌──────────────────────────────────────────────────────────────────────────────────────────────┐
+│                          data/data.json                                                       │
+│   • Single source-of-truth artifact                                                          │
+│   • Committed to repo (data-as-code)                                                         │
+│   • Validated against schemas/data-schema.json                                               │
+└──────────────────────────────────┬───────────────────────────────────────────────────────────┘
+                                   │
+                                   ▼
+┌──────────────────────────────────────────────────────────────────────────────────────────────┐
+│                          app/ (Stlite Frontend)                                               │
+│   • Streamlit dashboard running in the browser (no server)                                   │
+│   • Deployed to GitHub Pages                                                                 │
+│   • Reads data.json directly                                                                 │
+│   • KPI cards, sentiment timeline, triage table with explanations, topic breakdown           │
+└──────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ## Project Structure
 
 ```
 ├── .github/workflows/
-│   ├── collect-data.yml       # Scheduled ETL (cron + manual trigger)
-│   ├── validate-data.yml      # Schema + quality checks on PR
+│   ├── collect-data.yml       # Scheduled ETL (cron + manual trigger, includes Ollama)
+│   ├── validate-data.yml      # Schema + quality checks on PR (includes Ollama)
 │   └── deploy-app.yml         # Build & deploy Stlite to GitHub Pages
 │
 ├── scripts/
+│   ├── __init__.py            # Package marker
 │   ├── collect.py             # ETL orchestrator
-│   ├── transform.py           # Normalization + sentiment analysis
+│   ├── transform.py           # Normalization, SLM sentiment, competitor intel, pruning
+│   ├── slm.py                 # SLM wrapper (Ollama + Phi-3.5) with keyword fallback
 │   ├── validate.py            # JSON Schema validation + quality gates
+│   ├── build_stlite_site.py   # Builds static site for GitHub Pages
 │   ├── requirements.txt
 │   └── sources/
 │       ├── __init__.py        # Source registry
+│       ├── rss_scraper.py     # RSS feed aggregator (fully integrated)
 │       ├── reddit.py          # Reddit collector
 │       ├── discord.py         # Discord collector
 │       └── github_discussions.py  # GitHub Discussions collector
 │
 ├── app/
+│   ├── __init__.py
 │   ├── app.py                 # Stlite/Streamlit entry point
 │   ├── requirements.txt
 │   ├── components/
+│   │   ├── __init__.py
 │   │   ├── dashboard.py       # KPI summary cards
+│   │   ├── signal_table.py    # Threat/opportunity triage table with explanations
 │   │   ├── timeline.py        # Sentiment-over-time chart
 │   │   └── topic_cloud.py     # Topic breakdown bar chart
 │   └── utils/
+│       ├── __init__.py
 │       └── data_loader.py     # JSON loader + DataFrame helpers
 │
 ├── data/
@@ -80,6 +92,7 @@ A serverless community sentiment monitoring system for Everpure. Collects signal
 ├── schemas/
 │   └── data-schema.json       # JSON Schema for validation
 │
+├── rss_feeds.json             # RSS feed configuration
 ├── README.md
 └── .gitignore
 ```
@@ -91,18 +104,40 @@ Each signal in `data.json` captures:
 | Field | Type | Description |
 |---|---|---|
 | `id` | string | Unique signal identifier (`sig_<hash>`) |
-| `source` | enum | `reddit`, `discord`, or `github_discussions` |
+| `source` | enum | `reddit`, `discord`, `github_discussions`, `blog`, `industry_news`, etc. |
 | `source_url` | string | Link to the original post/message |
 | `date` | ISO 8601 | When the signal was created |
 | `topic` | string | Normalized topic label |
-| `sentiment_score` | float | -1.0 (negative) to 1.0 (positive) |
+| `sentiment_score` | float | -1.0 (negative) to 1.0 (positive) — computed by SLM |
 | `confidence` | float | 0.0 (low) to 1.0 (high) |
-| `author` | string | Username (anonymized if needed) |
+| `author` | string | SHA-256 hashed username (`usr_<hash>`) — no PII stored |
 | `content_preview` | string | First 500 chars of content |
 | `engagement` | object | `{likes, replies, shares}` |
 | `tags` | string[] | Categorization tags |
+| `competitor_intel` | object | `{alert_level, classification, entities_detected, explanation, signal_text}` |
 
 The `summary` block includes pre-computed rollups: `overall_sentiment`, `top_topics`, and `sentiment_trend` by day.
+
+## Key Features
+
+### SLM-Powered Analysis (Phi-3.5 via Ollama)
+
+Sentiment analysis and competitor intelligence are powered by a Small Language Model (Phi-3.5) running locally via Ollama. The SLM:
+
+- **Analyzes sentiment** with nuanced understanding of enterprise storage context
+- **Classifies competitive signals** as Threat, Opportunity, or Neutral with a human-readable explanation
+- **Infers topics** from content (15 topic categories)
+- **Falls back gracefully** to keyword-based analysis if Ollama is unavailable
+
+### Privacy-by-Design
+
+- **All author names are irreversibly hashed** using SHA-256 with a salt — no PII is ever stored in the repo
+- **Deterministic hashing** means the same author always produces the same hash, enabling repeat-contributor tracking without revealing identities
+- **30-day data retention** — signals older than 30 days are automatically pruned during each ETL run
+
+### Audit Trail
+
+Every Threat or Opportunity classification includes an `explanation` field describing why the SLM made that decision. This provides a transparent audit trail for all competitive intelligence signals.
 
 ## Getting Started
 
@@ -113,14 +148,32 @@ The `summary` block includes pre-computed rollups: `overall_sentiment`, `top_top
 pip install -r scripts/requirements.txt
 
 # Run the ETL pipeline (sources without credentials will skip)
-python scripts/collect.py
+python3 scripts/collect.py
 
 # Validate the output
-python scripts/validate.py
+python3 scripts/validate.py
 
 # Run the frontend (requires stlite)
 pip install stlite
 stlite run app/app.py
+```
+
+### Running with SLM (Optional)
+
+The pipeline works without Ollama (falls back to keyword-based analysis). To enable SLM-powered analysis:
+
+```bash
+# Install Ollama
+curl -fsSL https://ollama.com/install.sh | sh
+
+# Pull the model
+ollama pull phi3.5:3.8b-mini-instruct-q4_K_M
+
+# Start Ollama
+ollama serve
+
+# Run the pipeline (it will auto-detect Ollama)
+python3 scripts/collect.py
 ```
 
 ### GitHub Actions Setup
@@ -132,6 +185,7 @@ stlite run app/app.py
    - `GITHUB_TOKEN` (auto-provided, but override if needed)
 3. Enable GitHub Pages (Settings > Pages > Source: GitHub Actions)
 4. The `collect-data.yml` workflow runs daily at 06:00 UTC
+5. Ollama and Phi-3.5 are automatically installed in the workflow runner
 
 ### Adding a New Source
 
@@ -144,8 +198,8 @@ stlite run app/app.py
 
 | Workflow | Trigger | Action |
 |---|---|---|
-| **collect-data.yml** | Daily cron + manual | Runs ETL, validates, commits updated `data.json` |
-| **validate-data.yml** | PR to `data/`, `scripts/`, `schemas/` | Validates schema + runs dry-run ETL |
+| **collect-data.yml** | Daily cron + manual | Installs Ollama, runs ETL with SLM, validates, commits updated `data.json` |
+| **validate-data.yml** | PR to `data/`, `scripts/`, `schemas/` | Installs Ollama, validates schema + runs dry-run ETL |
 | **deploy-app.yml** | Push to `main` (app/ or data/ changes) | Builds Stlite app, deploys to GitHub Pages |
 
 ## Technical Deep Dive
@@ -254,9 +308,9 @@ The `_site/` directory is git-ignored, which is correct for production. However:
 - **Current:** `stlite run app/app.py` works locally, but the exact runtime differs from the GitHub Actions build
 - **Improvement:** Add a Dockerfile or dev container to ensure identical environments
 
-#### 7. Missing RSS Scraper
-- **Current:** `scripts/sources/rss_scraper.py` exists but isn't integrated
-- **Improvement:** Complete the RSS integration to pull from industry news sites
+#### 7. Ollama Model Download Time
+- **Current:** The GitHub Actions workflow downloads the Phi-3.5 model (~2.3GB) on every run
+- **Improvement:** Cache the Ollama model between workflow runs using GitHub Actions cache
 
 #### 8. Schema Validation Timing
 - **Current:** `validate-data.yml` runs on PRs, but `collect-data.yml` commits data without validation
@@ -268,34 +322,38 @@ The `_site/` directory is git-ignored, which is correct for production. However:
 - **`app/app.py`** - Streamlit entry point with sys.path fix
 - **`app/components/dashboard.py`** - KPI cards (threats, opportunities, technical mentions)
 - **`app/components/timeline.py`** - Altair scatter chart (source vs sentiment, last 30 days)
-- **`app/components/signal_table.py`** - Color-coded triage table (threats/opportunities only)
+- **`app/components/signal_table.py`** - Color-coded triage table with explanation column
 - **`app/components/topic_cloud.py`** - Topic breakdown bar chart with sentiment coloring
 - **`app/utils/data_loader.py`** - JSON loader, DataFrame conversion, filtering, stats computation
 
 #### ETL Pipeline
 - **`scripts/collect.py`** - Orchestrator that runs all source collectors
+- **`scripts/slm.py`** - SLM wrapper (Ollama + Phi-3.5) for sentiment, competitor intel, topic inference
+- **`scripts/transform.py`** - Cleaning, SLM sentiment, competitor intel with explanations, 30-day pruning, author hashing
+- **`scripts/validate.py`** - JSON Schema validation + quality gates
+- **`scripts/sources/rss_scraper.py`** - RSS feed aggregator (fully integrated)
 - **`scripts/sources/reddit.py`** - Reddit API collector (PRAW)
 - **`scripts/sources/discord.py`** - Discord API collector (discord.py)
 - **`scripts/sources/github_discussions.py`** - GitHub Discussions collector (PyGithub)
-- **`scripts/sources/rss_scraper.py`** - RSS feed scraper (incomplete)
-- **`scripts/transform.py`** - Normalization, sentiment analysis (TextBlob), summary rollups
-- **`scripts/validate.py`** - JSON Schema validation + quality gates
 
 #### Build & Deployment
 - **`scripts/build_stlite_site.py`** - Downloads Stlite, inlines files, generates `_site/index.html`
 - **`.github/workflows/deploy-app.yml`** - Builds and deploys to GitHub Pages
-- **`.github/workflows/collect-data.yml`** - Daily ETL cron job
-- **`.github/workflows/validate-data.yml`** - PR validation for data/schema changes
+- **`.github/workflows/collect-data.yml`** - Daily ETL cron job (with Ollama)
+- **`.github/workflows/validate-data.yml`** - PR validation for data/schema changes (with Ollama)
 
 #### Data & Configuration
 - **`data/data.json`** - Single source-of-truth artifact (committed to repo)
-- **`schemas/data-schema.json`** - JSON Schema for validation
-- **`rss_feeds.json`** - RSS feed configuration
+- **`schemas/data-schema.json`** - JSON Schema for validation (includes `explanation` field)
+- **`rss_feeds.json`** - RSS feed configuration (10 feeds configured)
 - **`app/requirements.txt`** - Streamlit, Altair, Pandas (for Pyodide)
-- **`scripts/requirements.txt`** - PRAW, discord.py, PyGithub, TextBlob, pandas
+- **`scripts/requirements.txt`** - requests, jsonschema, feedparser, python-dateutil
 
-### Recent Fixes (Git History)
+### Recent Changes
 
+- **`23f968a`** - Author hashing: all usernames irreversibly hashed with SHA-256 for PII-safe tracking
+- **`978366e`** - 30-day data retention: automatic pruning of signals older than 30 days
+- **`e94e50d`** - SLM integration: Phi-3.5 via Ollama for sentiment analysis and competitor intel with explanations
 - **`eaa4afe`** - Added `sys.path.insert()` to resolve app package imports in Stlite
 - **`664b2b4`** - Added missing `__init__.py` files for Python package structure
 - **`4aa9890`** - Removed duplicate Stlite script tag causing GitHub Pages 404
@@ -304,23 +362,17 @@ The `_site/` directory is git-ignored, which is correct for production. However:
 
 ## Council Review
 
-**3 perspectives on the serverless / GitHub Actions approach:**
-
-**👷 Blue-Collar & Logistics (Warehouse Manager):**
-> "Relying on GitHub Actions for your ETL means your data pipeline stops the second GitHub has an outage or you hit your action-minutes cap. What happens when the cron misses a window? I'd want a local fallback script documented so someone can run it from a terminal without needing the CI machinery."
-
-**🧑‍🏫 Education & Growth (Teacher / Community Educator):**
-> "The schema is clean, but new contributors will need a clear 'how to add a source' guide. If adding a Reddit scraper requires touching `collect.py`, `sources/reddit.py`, the schema, and the workflow — that's four touchpoints. Consider a plugin-style registration pattern so adding a source is a one-file change."
+**3 perspectives on the SLM-powered competitive intelligence approach:**
 
 **👩‍💻 Technical & Architecture (Infrastructure Engineer):**
-> "Committing data.json back to the repo from a GitHub Action creates a write loop that can trigger infinite CI runs if not careful. You'll need `[skip ci]` in the commit message and a path filter on the deploy workflow to avoid cascading builds. Also, for anything beyond ~500 signals, a single JSON file will become a git-blame nightmare — consider sharding by month or using JSON Lines."
+> "Running Ollama in a GitHub Actions runner is clever but expensive — the Phi-3.5 model is ~2.3GB and takes several minutes to download on every run. I'd cache the model between runs. Also, the keyword fallback is a good safety net, but you should test that the fallback path doesn't silently degrade quality without alerting anyone."
 
-**🧑‍🔬 Additional Perspective (QA Engineer / Tester):**
-> "The Stlite runtime is ~87MB and loads entirely in the browser. There's no apparent test coverage for the frontend components, and the error handling is generic. I'd want to see: (1) unit tests for `data_loader.py` functions, (2) integration tests that verify the build script produces valid HTML, and (3) a staging deployment to test changes before they hit production."
+**🧑‍🏫 Education & Growth (Teacher / Community Educator):**
+> "The `explanation` field on every Threat/Opportunity classification is exactly what I'd want to see. It turns the dashboard from a black box into a teaching tool — anyone can understand *why* something was flagged. The author hashing is also a nice touch: you can track repeat contributors without exposing identities."
 
-**👨‍👩‍👧‍👦 General Consumer (Everyday Working Parent):**
-> "I appreciate that this works without installing anything, but waiting 30-60 seconds for the first load is a long time. Can you add a progress indicator or skeleton UI? Also, what happens if my internet is slow? Is there a way to cache the Stlite runtime locally so it doesn't re-download every time?"
+**👷 Blue-Collar & Logistics (Warehouse Manager):**
+> "The 30-day data rotation makes sense — keeps things lean and relevant. But what happens if the workflow fails for a week? Do you lose a full week of signals? I'd want a grace period or a warning when pruning removes more signals than expected."
 
 ---
 
-Built with Stlite + Streamlit. No servers required.
+Built with Stlite + Streamlit + Ollama. No servers required.
