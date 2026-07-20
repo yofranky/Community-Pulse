@@ -43,18 +43,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r scripts/requirements.txt
 
-      - name: Install Ollama for SLM inference
-        run: |
-          curl -fsSL https://ollama.com/install.sh | sh
-          ollama pull phi3.5:3.8b-mini-instruct-q4_K_M
-          # Start Ollama in background and wait for it to be ready
-          ollama serve &
-          sleep 5
-          # Verify model is loaded
-          ollama list | grep phi3.5 || echo "Model check done"
-
       - name: Run ETL collection
         env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
           REDDIT_CLIENT_SECRET: ${{ secrets.REDDIT_CLIENT_SECRET }}
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
