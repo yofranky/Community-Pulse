@@ -47,7 +47,10 @@ def render(df):
         content_preview = str(row.get("content_preview", ""))[:120]
         source_url = row.get("source_url", "")
         entities = row.get("entities_detected", "")
+<<<<<<< HEAD
         explanation = row.get("explanation", "")
+=======
+>>>>>>> 7aa848706d4620cefaa2750ef34e3fe3d9b4aab9
 
         # Determine row background color
         if alert_level == 3:
@@ -109,6 +112,7 @@ def render(df):
         else:
             entities_html = ""
 
+<<<<<<< HEAD
         # Explanation tooltip
         if explanation:
             explanation_html = (
@@ -119,6 +123,8 @@ def render(df):
         else:
             explanation_html = "—"
 
+=======
+>>>>>>> 7aa848706d4620cefaa2750ef34e3fe3d9b4aab9
         rows_html += f"""
         <tr style="background:{row_bg}; border-bottom:1px solid #F3F4F6;">
             <td style="padding:10px 12px; font-size:13px; color:#6B7280; white-space:nowrap;">
@@ -142,9 +148,12 @@ def render(df):
             <td style="padding:10px 12px; font-size:12px; color:#6B7280; max-width:250px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
                 {content_preview}
             </td>
+<<<<<<< HEAD
             <td style="padding:10px 12px; font-size:11px; color:#6B7280; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-style:italic;">
                 {explanation_html}
             </td>
+=======
+>>>>>>> 7aa848706d4620cefaa2750ef34e3fe3d9b4aab9
             <td style="padding:10px 12px; text-align:center;">
                 {link_html}
             </td>
@@ -170,8 +179,12 @@ def render(df):
                     <th style="padding:12px; text-align:center; font-size:12px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.5px;">Class</th>
                     <th style="padding:12px; text-align:left; font-size:12px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.5px;">Entities</th>
                     <th style="padding:12px; text-align:left; font-size:12px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.5px;">Preview</th>
+<<<<<<< HEAD
                     <th style="padding:12px; text-align:left; font-size:12px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.5px;">Why?</th>
             <th style="padding:12px; text-align:center; font-size:12px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.5px;">Link</th>
+=======
+                    <th style="padding:12px; text-align:center; font-size:12px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.5px;">Link</th>
+>>>>>>> 7aa848706d4620cefaa2750ef34e3fe3d9b4aab9
                 </tr>
             </thead>
             <tbody>

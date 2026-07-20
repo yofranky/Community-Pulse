@@ -3,11 +3,16 @@
 requests>=2.31.0
 jsonschema>=4.20.0
 
+<<<<<<< HEAD
 # SLM / Ollama
 # requests already covers Ollama API calls
 
 # Sentiment Analysis
 # textblob>=0.17.1            # Replaced by SLM (scripts/slm.py)
+=======
+# Sentiment Analysis
+textblob>=0.17.1
+>>>>>>> 7aa848706d4620cefaa2750ef34e3fe3d9b4aab9
 
 # Data Processing
 python-dateutil>=2.8.2

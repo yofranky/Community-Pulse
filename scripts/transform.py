@@ -10,6 +10,7 @@ Includes a 'cleaner' function to:
 - Normalize technical jargon from enterprise storage / data infrastructure sources
 """
 
+<<<<<<< HEAD
 from __future__ import annotations
 
 import hashlib
@@ -19,6 +20,15 @@ from datetime import datetime, timedelta, timezone
 from typing import Any
 
 from scripts.slm import analyze_sentiment, classify_competitor_intel, infer_topic as slm_infer_topic
+=======
+import hashlib
+import json
+import re
+from datetime import datetime, timezone
+from typing import Any
+
+from textblob import TextBlob
+>>>>>>> 7aa848706d4620cefaa2750ef34e3fe3d9b4aab9
 
 
 # ── Jargon Normalization Map ───────────────────────────────────────
@@ -104,6 +114,7 @@ SOURCE_BIAS_MAP: dict[str, int] = {
     "dell_infohub": 1,
 }
 
+<<<<<<< HEAD
 # ── Author Anonymization ────────────────────────────────────────────
 # All author names are irreversibly hashed using SHA-256 to:
 # 1. Preserve privacy (no PII stored in the repo)
@@ -112,6 +123,8 @@ SOURCE_BIAS_MAP: dict[str, int] = {
 # 3. Use a fixed salt to prevent rainbow table attacks
 AUTHOR_HASH_SALT = "community-pulse-v1"
 
+=======
+>>>>>>> 7aa848706d4620cefaa2750ef34e3fe3d9b4aab9
 
 def content_fingerprint(text: str) -> str:
     """
@@ -270,6 +283,7 @@ def clean_signals(raw_signals: dict[str, list[dict]]) -> dict[str, list[dict]]:
     return cleaned
 
 
+<<<<<<< HEAD
 # ── Data Retention (30-day pruning) ────────────────────────────────
 # Signals older than this threshold are rotated out to ensure relevance
 # and minimize data footprint (privacy-by-design policy).
@@ -322,6 +336,8 @@ def prune_old_signals(signals: list[dict], max_age_days: int = DATA_RETENTION_DA
     return kept
 
 
+=======
+>>>>>>> 7aa848706d4620cefaa2750ef34e3fe3d9b4aab9
 # ── Competitor Watch ───────────────────────────────────────────────
 # Defensive/Offensive intelligence: detects competitor mentions and
 # classifies signals as Threat, Opportunity, or Neutral.
@@ -461,16 +477,23 @@ def normalize_signal(raw: dict, source: str) -> dict | None:
     sentiment = raw.get("sentiment_score")
     confidence = raw.get("confidence")
     if sentiment is None:
+<<<<<<< HEAD
         # Use SLM for sentiment analysis (falls back to keyword-based if unavailable)
         slm_result = analyze_sentiment(content)
         sentiment = slm_result["sentiment_score"]
         confidence = slm_result["confidence"]
+=======
+        blob = TextBlob(content)
+        sentiment = round(blob.sentiment.polarity, 4)
+        confidence = round(blob.sentiment.subjectivity, 4)
+>>>>>>> 7aa848706d4620cefaa2750ef34e3fe3d9b4aab9
 
     # Parse / normalize date
     date_str = raw.get("date", "")
     if isinstance(date_str, (int, float)):
         date_str = datetime.fromtimestamp(date_str, tz=timezone.utc).isoformat()
 
+<<<<<<< HEAD
     # Hash the author name (privacy-by-design, preserves tracking)
     raw_author = raw.get("author", "anonymous")
     if raw_author and raw_author != "anonymous":
@@ -481,6 +504,8 @@ def normalize_signal(raw: dict, source: str) -> dict | None:
     else:
         author = "anonymous"
 
+=======
+>>>>>>> 7aa848706d4620cefaa2750ef34e3fe3d9b4aab9
     return {
         "id": signal_id,
         "source": source,
@@ -489,7 +514,11 @@ def normalize_signal(raw: dict, source: str) -> dict | None:
         "topic": raw.get("topic", "general"),
         "sentiment_score": max(-1.0, min(1.0, sentiment)),
         "confidence": max(0.0, min(1.0, confidence if confidence is not None else 0.5)),
+<<<<<<< HEAD
         "author": author,
+=======
+        "author": raw.get("author", "anonymous"),
+>>>>>>> 7aa848706d4620cefaa2750ef34e3fe3d9b4aab9
         "content_preview": content[:500],
         "engagement": {
             "likes": raw.get("engagement", {}).get("likes", 0),
@@ -627,8 +656,13 @@ def transform(
 
                 seen_fingerprints[fingerprint] = (signal_date, source)
 
+<<<<<<< HEAD
                 # ── Competitor watch with SLM (includes explanation) ──
                 intel = classify_competitor_intel(content, title)
+=======
+                # ── Competitor watch with source bias ───────────────
+                intel = competitor_watch(content, title)
+>>>>>>> 7aa848706d4620cefaa2750ef34e3fe3d9b4aab9
                 if intel["alert_level"] > 1:
                     # Apply source bias penalty: competitor-owned channels
                     # get +1 to alert_level (their self-praise is expected)
@@ -643,6 +677,7 @@ def transform(
                     signal["competitor_intel"] = intel
                     print(f"[intel] {intel['classification'].upper()}: "
                           f"{intel['entities_detected']} (level {intel['alert_level']})")
+<<<<<<< HEAD
                     if intel.get("explanation"):
                         print(f"[intel] Why: {intel['explanation']}")
                 normalized.append(signal)
@@ -650,6 +685,12 @@ def transform(
     # Step 3: Prune old signals from existing data (30-day retention policy)
     if existing_data and "signals" in existing_data:
         existing_data["signals"] = prune_old_signals(existing_data["signals"])
+=======
+                normalized.append(signal)
+
+    # Step 3: Merge with existing signals if provided (dedup by ID)
+    if existing_data and "signals" in existing_data:
+>>>>>>> 7aa848706d4620cefaa2750ef34e3fe3d9b4aab9
         existing_ids = {s["id"] for s in normalized}
         for s in existing_data["signals"]:
             if s["id"] not in existing_ids:

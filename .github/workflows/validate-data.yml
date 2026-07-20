@@ -27,6 +27,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r scripts/requirements.txt
 
+<<<<<<< HEAD
       - name: Install Ollama for SLM validation
         run: |
           curl -fsSL https://ollama.com/install.sh | sh
@@ -34,6 +35,8 @@ jobs:
           ollama serve &
           sleep 5
 
+=======
+>>>>>>> 7aa848706d4620cefaa2750ef34e3fe3d9b4aab9
       - name: Validate data.json against schema
         run: python scripts/validate.py --data data/data.json --schema schemas/data-schema.json --strict
 
