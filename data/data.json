@@ -14,11 +14,7 @@
       "topic": "storage_performance",
       "sentiment_score": 0.85,
       "confidence": 0.90,
-<<<<<<< HEAD
       "author": "usr_72e0128068c5d216",
-=======
-      "author": "everpure_eng",
->>>>>>> 7aa848706d4620cefaa2750ef34e3fe3d9b4aab9
       "content_preview": "In this post we explore NVMe over Fabrics performance characteristics for all-flash arrays. Our QLC-based systems achieve 2 million IOPS with sub-100 microsecond latency, representing a 3x improvement over the previous generation.",
       "engagement": { "likes": 127, "replies": 34, "shares": 45 },
       "tags": ["nvme_over_fabrics", "all_flash", "qlc_nand", "io_per_second", "engineering_deep_dive"]
@@ -31,11 +27,7 @@
       "topic": "enterprise_data_cloud",
       "sentiment_score": 0.70,
       "confidence": 0.85,
-<<<<<<< HEAD
       "author": "usr_d12120e085a27e60",
-=======
-      "author": "everpure_marketing",
->>>>>>> 7aa848706d4620cefaa2750ef34e3fe3d9b4aab9
       "content_preview": "Introducing the Everpure Enterprise Data Cloud: a unified data management platform that spans hybrid and multi-cloud environments. Built for AI-ready infrastructure with native Kubernetes integration.",
       "engagement": { "likes": 89, "replies": 22, "shares": 67 },
       "tags": ["enterprise_data_cloud", "hybrid_cloud", "ai_ml_infrastructure", "kubernetes", "product_release"]
@@ -48,11 +40,7 @@
       "topic": "industry_analysis",
       "sentiment_score": 0.60,
       "confidence": 0.80,
-<<<<<<< HEAD
       "author": "usr_349aa99cc6c8cfab",
-=======
-      "author": "storage_news",
->>>>>>> 7aa848706d4620cefaa2750ef34e3fe3d9b4aab9
       "content_preview": "Everpure positioned as a Leader in the Gartner Magic Quadrant for Primary Storage. The report highlights Everpure's strong focus on AI-ready infrastructure and cloud-native storage solutions as key differentiators in the enterprise market.",
       "engagement": { "likes": 210, "replies": 45, "shares": 89 },
       "tags": ["industry_analysis", "gartner", "magic_quadrant", "enterprise_data_cloud"]
@@ -65,11 +53,7 @@
       "topic": "cloud_native_storage",
       "sentiment_score": 0.75,
       "confidence": 0.85,
-<<<<<<< HEAD
       "author": "usr_e5b5cdf7b07febc1",
-=======
-      "author": "cloud_native_daily",
->>>>>>> 7aa848706d4620cefaa2750ef34e3fe3d9b4aab9
       "content_preview": "The Container Storage Interface driver for Everpure enterprise storage has reached general availability, enabling stateful workloads on Kubernetes with persistent storage that scales to petabyte级别.",
       "engagement": { "likes": 156, "replies": 28, "shares": 52 },
       "tags": ["container_storage_interface", "kubernetes", "general_availability", "cloud_native_storage"]
@@ -82,11 +66,7 @@
       "topic": "security_compliance",
       "sentiment_score": 0.45,
       "confidence": 0.75,
-<<<<<<< HEAD
       "author": "usr_349aa99cc6c8cfab",
-=======
-      "author": "storage_news",
->>>>>>> 7aa848706d4620cefaa2750ef34e3fe3d9b4aab9
       "content_preview": "New report shows 78% of enterprises are prioritizing immutable storage and air-gapped backup solutions for ransomware protection. Everpure's recently announced SafeMode immutability feature aligns with this trend.",
       "engagement": { "likes": 93, "replies": 18, "shares": 34 },
       "tags": ["security_compliance", "ransomware", "data_protection", "immutable_storage"]
@@ -99,11 +79,7 @@
       "topic": "ai_ml_infrastructure",
       "sentiment_score": 0.65,
       "confidence": 0.80,
-<<<<<<< HEAD
       "author": "usr_ff9bbd20e29606ae",
-=======
-      "author": "ai_infra_alliance",
->>>>>>> 7aa848706d4620cefaa2750ef34e3fe3d9b4aab9
       "content_preview": "Building efficient data pipelines for large language model training requires storage infrastructure that can sustain high-throughput reads with low latency. We examine how parallel filesystems and object storage are evolving to meet AI workload demands.",
       "engagement": { "likes": 178, "replies": 42, "shares": 61 },
       "tags": ["ai_ml_infrastructure", "large_language_model", "data_pipeline", "high_performance_computing"]
@@ -116,11 +92,7 @@
       "topic": "devops_sre",
       "sentiment_score": 0.80,
       "confidence": 0.88,
-<<<<<<< HEAD
       "author": "usr_72e0128068c5d216",
-=======
-      "author": "everpure_eng",
->>>>>>> 7aa848706d4620cefaa2750ef34e3fe3d9b4aab9
       "content_preview": "How we built the Everpure Kubernetes Operator to manage persistent storage at scale. Using a custom controller with Kubernetes CSI and operator pattern to automate storage provisioning, snapshotting, and disaster recovery.",
       "engagement": { "likes": 145, "replies": 31, "shares": 48 },
       "tags": ["kubernetes", "devops_sre", "container_storage_interface", "disaster_recovery", "engineering_deep_dive"]
@@ -133,11 +105,7 @@
       "topic": "cloud_native_storage",
       "sentiment_score": 0.55,
       "confidence": 0.78,
-<<<<<<< HEAD
       "author": "usr_e5b5cdf7b07febc1",
-=======
-      "author": "cloud_native_daily",
->>>>>>> 7aa848706d4620cefaa2750ef34e3fe3d9b4aab9
       "content_preview": "Best practices for running stateful workloads on Kubernetes: persistent volume claims, storage classes, and backup strategies. Includes benchmarks for database workloads on various CSI driver implementations.",
       "engagement": { "likes": 112, "replies": 27, "shares": 38 },
       "tags": ["cloud_native_storage", "kubernetes", "persistent_volume", "stateful_workload"]
@@ -150,11 +118,7 @@
       "topic": "competitor_news",
       "sentiment_score": 0.72,
       "confidence": 0.82,
-<<<<<<< HEAD
       "author": "usr_c0bb7b086e3fb5b6",
-=======
-      "author": "netapp_blog",
->>>>>>> 7aa848706d4620cefaa2750ef34e3fe3d9b4aab9
       "content_preview": "NetApp ONTAP recognized as a leader in enterprise storage for the seventh consecutive year. The latest release delivers groundbreaking performance improvements for hybrid cloud deployments and AI workloads.",
       "engagement": { "likes": 88, "replies": 12, "shares": 34 },
       "tags": ["netapp", "competitor_news", "industry_analysis", "hybrid_cloud"],
@@ -162,10 +126,7 @@
         "alert_level": 3,
         "classification": "threat",
         "entities_detected": ["netapp"],
-<<<<<<< HEAD
         "explanation": "NetApp ONTAP praised as a leader for the seventh consecutive year with 'groundbreaking' performance improvements — this is a threat signal as it strengthens a direct competitor's market position.",
-=======
->>>>>>> 7aa848706d4620cefaa2750ef34e3fe3d9b4aab9
         "signal_text": "netapp ontap recognized as a leader in enterprise storage for the seventh consecutive year. the latest release delivers groundbreaking performance"
       }
     },
@@ -177,11 +138,7 @@
       "topic": "community_discussion",
       "sentiment_score": 0.30,
       "confidence": 0.70,
-<<<<<<< HEAD
       "author": "usr_171c33fcd0eb4ef1",
-=======
-      "author": "sysadmin_user",
->>>>>>> 7aa848706d4620cefaa2750ef34e3fe3d9b4aab9
       "content_preview": "Anyone else considering migrating from Dell PowerStore to Everpure? We're tired of the licensing complexity and the support has been inconsistent. Looking at Everpure's all-flash line as an alternative.",
       "engagement": { "likes": 45, "replies": 23, "shares": 7 },
       "tags": ["community_discussion", "dell", "everpure", "migration"],
@@ -189,10 +146,7 @@
         "alert_level": 2,
         "classification": "opportunity",
         "entities_detected": ["dell", "everpure"],
-<<<<<<< HEAD
         "explanation": "User explicitly inquiring about migrating from Dell PowerStore to Everpure due to licensing frustration and inconsistent support — this is a direct migration opportunity signal.",
-=======
->>>>>>> 7aa848706d4620cefaa2750ef34e3fe3d9b4aab9
         "signal_text": "anyone else considering migrating from dell powerstore to everpure? we're tired of the licensing complexity and the support has been"
       }
     },
@@ -204,11 +158,7 @@
       "topic": "competitor_news",
       "sentiment_score": 0.60,
       "confidence": 0.78,
-<<<<<<< HEAD
       "author": "usr_14bbd95a3fe42081",
-=======
-      "author": "dell_tech",
->>>>>>> 7aa848706d4620cefaa2750ef34e3fe3d9b4aab9
       "content_preview": "Introducing the next generation of Dell PowerStore: a new architecture that delivers up to 40% better performance than previous generations. Purpose-built for modern data centers with integrated AIOps capabilities.",
       "engagement": { "likes": 67, "replies": 15, "shares": 22 },
       "tags": ["dell", "competitor_news", "storage_performance", "product_release"],
@@ -216,10 +166,7 @@
         "alert_level": 3,
         "classification": "threat",
         "entities_detected": ["dell"],
-<<<<<<< HEAD
         "explanation": "Dell announces next-gen PowerStore with 40% performance improvement and integrated AIOps — this is a threat as it strengthens a primary competitor's product lineup.",
-=======
->>>>>>> 7aa848706d4620cefaa2750ef34e3fe3d9b4aab9
         "signal_text": "introducing the next generation of dell powerstore: a new architecture that delivers up to 40% better performance than previous generations"
       }
     }
