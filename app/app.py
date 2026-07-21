@@ -2,7 +2,7 @@
 Community Pulse - Stlite Frontend
 
 A serverless Streamlit dashboard (via Stlite) that visualizes community
-sentiment data from the Everpure community. Runs entirely in the browser
+sentiment data from the Pure community. Runs entirely in the browser
 with no backend server required.
 
 Features:
@@ -128,7 +128,7 @@ with st.sidebar:
                     Community Pulse
                 </p>
                 <p style="margin:0; font-size:12px; color:#6B7280;">
-                    Everpure Intelligence Dashboard
+                    Pure Intelligence Dashboard
                 </p>
             </div>
         </div>
@@ -167,7 +167,7 @@ with st.sidebar:
             GitHub Discussions, RSS feeds, and competitor channels.
         </p>
         <p style="font-size:12px; color:#6B7280; line-height:1.5;">
-            <strong>Threats</strong> = Competitor praise or Everpure criticism<br>
+            <strong>Threats</strong> = Competitor praise or Pure criticism<br>
             <strong>Opportunities</strong> = Migration inquiries or competitor criticism
         </p>
         """,

@@ -8,7 +8,7 @@ Handles connectivity errors gracefully so one dead feed never
 brings down the entire collection pipeline.
 
 Tuned for enterprise-grade RSS feeds in the data storage and
-infrastructure sector (Everpure Engineering Blog, StorageNewsletter,
+infrastructure sector (Pure Engineering Blog, StorageNewsletter,
 Kubernetes.io, AI Infrastructure Alliance, etc.).
 """
 

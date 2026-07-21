@@ -9,7 +9,7 @@
     {
       "id": "sig_a1b2c3d4",
       "source": "engineering",
-      "source_url": "https://blog.everpuredata.com/engineering/nvme-of-performance",
+      "source_url": "https://blog.pure.example.com/engineering/nvme-of-performance",
       "date": "2026-07-19T14:00:00Z",
       "topic": "storage_performance",
       "sentiment_score": 0.85,
@@ -22,26 +22,26 @@
     {
       "id": "sig_b2c3d4e5",
       "source": "blog",
-      "source_url": "https://blog.everpuredata.com/enterprise-data-cloud-launch",
+      "source_url": "https://blog.pure.example.com/enterprise-data-cloud-launch",
       "date": "2026-07-18T09:00:00Z",
       "topic": "enterprise_data_cloud",
       "sentiment_score": 0.70,
       "confidence": 0.85,
       "author": "usr_d12120e085a27e60",
-      "content_preview": "Introducing the Everpure Enterprise Data Cloud: a unified data management platform that spans hybrid and multi-cloud environments. Built for AI-ready infrastructure with native Kubernetes integration.",
+      "content_preview": "Introducing the Pure Enterprise Data Cloud: a unified data management platform that spans hybrid and multi-cloud environments. Built for AI-ready infrastructure with native Kubernetes integration.",
       "engagement": { "likes": 89, "replies": 22, "shares": 67 },
       "tags": ["enterprise_data_cloud", "hybrid_cloud", "ai_ml_infrastructure", "kubernetes", "product_release"]
     },
     {
       "id": "sig_c3d4e5f6",
       "source": "industry_news",
-      "source_url": "https://www.storagenewsletter.com/everpure-gartner-magic-quadrant",
+      "source_url": "https://www.storagenewsletter.com/pure-gartner-magic-quadrant",
       "date": "2026-07-17T12:30:00Z",
       "topic": "industry_analysis",
       "sentiment_score": 0.60,
       "confidence": 0.80,
       "author": "usr_349aa99cc6c8cfab",
-      "content_preview": "Everpure positioned as a Leader in the Gartner Magic Quadrant for Primary Storage. The report highlights Everpure's strong focus on AI-ready infrastructure and cloud-native storage solutions as key differentiators in the enterprise market.",
+      "content_preview": "Pure positioned as a Leader in the Gartner Magic Quadrant for Primary Storage. The report highlights Pure's strong focus on AI-ready infrastructure and cloud-native storage solutions as key differentiators in the enterprise market.",
       "engagement": { "likes": 210, "replies": 45, "shares": 89 },
       "tags": ["industry_analysis", "gartner", "magic_quadrant", "enterprise_data_cloud"]
     },
@@ -54,7 +54,7 @@
       "sentiment_score": 0.75,
       "confidence": 0.85,
       "author": "usr_e5b5cdf7b07febc1",
-      "content_preview": "The Container Storage Interface driver for Everpure enterprise storage has reached general availability, enabling stateful workloads on Kubernetes with persistent storage that scales to petabyte级别.",
+      "content_preview": "The Container Storage Interface driver for Pure enterprise storage has reached general availability, enabling stateful workloads on Kubernetes with persistent storage that scales to petabyte级别.",
       "engagement": { "likes": 156, "replies": 28, "shares": 52 },
       "tags": ["container_storage_interface", "kubernetes", "general_availability", "cloud_native_storage"]
     },
@@ -67,7 +67,7 @@
       "sentiment_score": 0.45,
       "confidence": 0.75,
       "author": "usr_349aa99cc6c8cfab",
-      "content_preview": "New report shows 78% of enterprises are prioritizing immutable storage and air-gapped backup solutions for ransomware protection. Everpure's recently announced SafeMode immutability feature aligns with this trend.",
+      "content_preview": "New report shows 78% of enterprises are prioritizing immutable storage and air-gapped backup solutions for ransomware protection. Pure's recently announced SafeMode immutability feature aligns with this trend.",
       "engagement": { "likes": 93, "replies": 18, "shares": 34 },
       "tags": ["security_compliance", "ransomware", "data_protection", "immutable_storage"]
     },
@@ -87,13 +87,13 @@
     {
       "id": "sig_g7h8i9j0",
       "source": "engineering",
-      "source_url": "https://blog.everpuredata.com/engineering/kubernetes-operator-deep-dive",
+      "source_url": "https://blog.pure.example.com/engineering/kubernetes-operator-deep-dive",
       "date": "2026-07-15T11:00:00Z",
       "topic": "devops_sre",
       "sentiment_score": 0.80,
       "confidence": 0.88,
       "author": "usr_72e0128068c5d216",
-      "content_preview": "How we built the Everpure Kubernetes Operator to manage persistent storage at scale. Using a custom controller with Kubernetes CSI and operator pattern to automate storage provisioning, snapshotting, and disaster recovery.",
+      "content_preview": "How we built the Pure Kubernetes Operator to manage persistent storage at scale. Using a custom controller with Kubernetes CSI and operator pattern to automate storage provisioning, snapshotting, and disaster recovery.",
       "engagement": { "likes": 145, "replies": 31, "shares": 48 },
       "tags": ["kubernetes", "devops_sre", "container_storage_interface", "disaster_recovery", "engineering_deep_dive"]
     },
@@ -133,21 +133,21 @@
     {
       "id": "sig_j0k1l2m3",
       "source": "reddit",
-      "source_url": "https://www.reddit.com/r/sysadmin/comments/everpure_vs_dell",
+      "source_url": "https://www.reddit.com/r/sysadmin/comments/pure_vs_dell",
       "date": "2026-07-18T16:20:00Z",
       "topic": "community_discussion",
       "sentiment_score": 0.30,
       "confidence": 0.70,
       "author": "usr_171c33fcd0eb4ef1",
-      "content_preview": "Anyone else considering migrating from Dell PowerStore to Everpure? We're tired of the licensing complexity and the support has been inconsistent. Looking at Everpure's all-flash line as an alternative.",
+      "content_preview": "Anyone else considering migrating from Dell PowerStore to Pure? We're tired of the licensing complexity and the support has been inconsistent. Looking at Pure's all-flash line as an alternative.",
       "engagement": { "likes": 45, "replies": 23, "shares": 7 },
-      "tags": ["community_discussion", "dell", "everpure", "migration"],
+      "tags": ["community_discussion", "dell", "pure", "migration"],
       "competitor_intel": {
         "alert_level": 2,
         "classification": "opportunity",
-        "entities_detected": ["dell", "everpure"],
-        "explanation": "User explicitly inquiring about migrating from Dell PowerStore to Everpure due to licensing frustration and inconsistent support — this is a direct migration opportunity signal.",
-        "signal_text": "anyone else considering migrating from dell powerstore to everpure? we're tired of the licensing complexity and the support has been"
+        "entities_detected": ["dell", "pure"],
+        "explanation": "User explicitly inquiring about migrating from Dell PowerStore to Pure due to licensing frustration and inconsistent support — this is a direct migration opportunity signal.",
+        "signal_text": "anyone else considering migrating from dell powerstore to pure? we're tired of the licensing complexity and the support has been"
       }
     },
     {

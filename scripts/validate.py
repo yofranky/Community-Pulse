@@ -15,6 +15,12 @@ from pathlib import Path
 import jsonschema
 from jsonschema import validate as json_validate
 
+# Sources whose `author` values must be anonymized (hashed as "usr_...")
+# before publication, since they represent real individual community
+# members rather than institutional/first-party accounts. Keep this in
+# sync with COMMUNITY_SOURCES in scripts/transform.py.
+COMMUNITY_SOURCES = {"reddit", "discord", "github_discussions"}
+
 
 def load_schema(path: str | Path = "schemas/data-schema.json") -> dict:
     """Load the JSON Schema file."""
@@ -26,6 +32,30 @@ def load_data(path: str | Path = "data/data.json") -> dict:
     """Load the data.json file."""
     with open(path) as f:
         return json.load(f)
+
+
+def check_privacy_gates(data: dict) -> list[str]:
+    """
+    Check that community-source authors are anonymized before publication.
+
+    This is a hard privacy gate, not a soft quality warning: data.json is
+    committed to a repo and can be published on a public GitHub Pages
+    site, so a real Reddit / Discord / GitHub username showing up here
+    means someone's identity is now tied to a "threat/opportunity"
+    classification of what they said. Failures here always block — never
+    downgraded to a non-blocking warning, even without --strict.
+    """
+    errors = []
+    for s in data.get("signals", []):
+        source = s.get("source", "")
+        author = s.get("author", "")
+        if source in COMMUNITY_SOURCES and author not in ("", "anonymous") and not author.startswith("usr_"):
+            errors.append(
+                f"Signal {s.get('id', '?')}: author '{author}' from community source "
+                f"'{source}' is not anonymized (expected 'usr_' hash prefix). "
+                f"This looks like a real username about to be published."
+            )
+    return errors
 
 
 def check_quality_gates(data: dict) -> list[str]:
@@ -92,6 +122,15 @@ def validate(
         print(f"FAIL: Schema validation error: {e.message}")
         print(f"  Path: {'.'.join(str(p) for p in e.absolute_path)}")
         return False
+
+    # Privacy gates — always blocking, regardless of --strict
+    privacy_errors = check_privacy_gates(data)
+    if privacy_errors:
+        for err in privacy_errors:
+            print(f"FAIL (privacy): {err}")
+        print("FAIL: Privacy gate failed. Unanonymized community usernames cannot be published.")
+        return False
+    print("PASS: Privacy gate passed (community authors anonymized).")
 
     # Quality gates
     quality_errors = check_quality_gates(data)

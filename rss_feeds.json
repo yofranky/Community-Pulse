@@ -1,7 +1,7 @@
 [
   {
-    "id": "everpure_blog",
-    "name": "Everpure Official Blog",
+    "id": "pure_blog",
+    "name": "Pure Official Blog",
     "url": "https://blog.everpuredata.com/feed",
     "source_label": "blog",
     "topic_hint": "product_news",
@@ -12,8 +12,8 @@
     "rate_limit_seconds": 3600
   },
   {
-    "id": "everpure_tech",
-    "name": "Everpure Engineering Blog",
+    "id": "pure_tech",
+    "name": "Pure Engineering Blog",
     "url": "https://blog.everpuredata.com/engineering/feed",
     "source_label": "engineering",
     "topic_hint": "engineering",

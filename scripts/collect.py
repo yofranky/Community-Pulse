@@ -20,6 +20,15 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
+# Detect --dry-run before importing transform, so transform.py's CI
+# hard-fail on a missing ANON_SALT can be skipped for dry runs. This
+# matters specifically for validate-data.yml: GitHub Actions doesn't give
+# pull_request workflows triggered from forks access to repo secrets, so
+# an external contributor's PR would otherwise always fail here even
+# though a dry-run never publishes anything and doesn't need a secure salt.
+if "--dry-run" in sys.argv:
+    os.environ.setdefault("COMMUNITY_PULSE_DRY_RUN", "1")
+
 from scripts.sources import SOURCES
 from scripts.transform import transform
 

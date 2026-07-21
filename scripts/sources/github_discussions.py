@@ -1,7 +1,7 @@
 """
 GitHub Discussions source collector for Community Pulse.
 
-Collects discussions from the Everpure community repository.
+Collects discussions from the Pure community repository.
 Uses PyGithub when a token is configured. Falls back gracefully.
 """
 
@@ -10,7 +10,7 @@ import os
 # Placeholder: real implementation requires PyGithub and a token
 # from github import Github
 
-REPO_OWNER = os.getenv("GITHUB_REPO_OWNER", "everpure")
+REPO_OWNER = os.getenv("GITHUB_REPO_OWNER", "pure")
 REPO_NAME = os.getenv("GITHUB_REPO_NAME", "community")
 
 

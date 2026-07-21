@@ -38,7 +38,7 @@ def render(intel_stats: dict):
                     {intel_stats['active_threats']}
                 </p>
                 <p style="margin:2px 0 0 0; font-size:12px; color:#9CA3AF;">
-                    Competitor praise or Everpure criticism
+                    Competitor praise or Pure criticism
                 </p>
             </div>
             """,

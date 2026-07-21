@@ -1,7 +1,7 @@
 """
 Reddit source collector for Community Pulse.
 
-Collects posts and comments from target Everpure subreddits.
+Collects posts and comments from target Pure subreddits.
 Uses PRAW (Python Reddit API Wrapper) when credentials are available.
 Falls back to a placeholder returning an empty list for local dev.
 """
@@ -11,7 +11,7 @@ import os
 # Placeholder: real implementation requires PRAW and Reddit API credentials
 # import praw
 
-SUBREDDITS = ["everpure", "waterfiltration", "commercialkitchen"]
+SUBREDDITS = ["sysadmin", "homelab", "storage", "kubernetes", "devops", "networking"]
 
 def collect() -> list[dict]:
     """Collect signals from Reddit. Returns a list of raw signal dicts."""
@@ -26,7 +26,7 @@ def collect() -> list[dict]:
     # reddit = praw.Reddit(
     #     client_id=client_id,
     #     client_secret=client_secret,
-    #     user_agent="community-pulse/v1 by /u/everpure_dev",
+    #     user_agent="community-pulse/v1 by /u/pure_dev",
     # )
     # signals = []
     # for subreddit_name in SUBREDDITS:

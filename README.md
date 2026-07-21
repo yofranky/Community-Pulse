@@ -1,4 +1,4 @@
-# Community Pulse — Everpure
+# Community Pulse — Pure
 
 A serverless community intelligence pipeline for enterprise storage. Collects signals from RSS feeds, Reddit, Discord, and GitHub Discussions, runs SLM-powered sentiment analysis and competitor classification, and visualizes the results in a browser-based dashboard — all with no backend servers.
 
@@ -357,6 +357,64 @@ The `_site/` directory is git-ignored, which is correct for production. However:
 - **`eaa4afe`** - Added `sys.path.insert()` to resolve app package imports in Stlite
 - **`664b2b4`** - Added missing `__init__.py` files for Python package structure
 - **`4aa9890`** - Removed duplicate Stlite script tag causing GitHub Pages 404
+
+---
+
+## Privacy & Ethics
+
+Full policy detail lives in [PRIVACY.md](./PRIVACY.md); this section is a
+summary of what this tool does, what safeguards are in place, and where
+it's honest about its own limits.
+
+**What this tool actually does.** Community Pulse scrapes public posts
+from Reddit, Discord, GitHub Discussions, and RSS feeds, and uses an SLM
+(Groq API) to classify each one as a competitive "Threat," "Opportunity,"
+or "Neutral" signal with a short explanation. That's a real form of
+profiling — anonymized author identity doesn't change the fact that
+individual people's public statements are being scored for a company's
+competitive advantage. We're not going to describe this tool as purely
+"for community support" when the code it runs is a competitor-watch
+classifier; that framing would be more flattering than accurate.
+
+**Where the "community support" framing is genuinely true.** Alongside
+the competitive-intelligence signals, the same classification surfaces
+things a community team should actually act on — repeated frustration
+with a specific feature, a support gap, a migration-inquiry pattern. A
+Community Program Manager using this well would be responding to that,
+not just monitoring it. Both uses are real; neither should be presented
+as the whole story.
+
+**Safeguards in place:**
+- **Author anonymization.** Real usernames from community sources are
+  SHA-256 hashed (salted via a required `ANON_SALT` secret, never
+  committed to source) before they reach `data.json`. Official/first-party
+  accounts (company blog, engineering) are left attributed since they're
+  not private individuals.
+- **A hard privacy gate.** `scripts/validate.py` refuses to pass — and
+  CI refuses to commit — any community-source signal whose author isn't
+  properly hashed. This isn't a warning that can be silently ignored.
+- **30-day data retention.** Signals older than 30 days are pruned
+  automatically on each run, not kept indefinitely.
+- **Third-party processing is disclosed, not hidden.** Signal content is
+  sent to Groq's API for classification. Per Groq's policy, that data
+  isn't used for training and isn't retained by default beyond brief
+  abuse-monitoring logs — but the raw post text itself (not just the
+  author) is what's sent, and that's not redacted before the API call.
+  See PRIVACY.md for the full breakdown of what that means in practice.
+- **No real company/brand name in public-facing text.** The company
+  this project tracks is referred to as "Pure" throughout code comments,
+  UI, docs, and SLM prompts — including in what's sent to Groq — since
+  this is an independent project, not an official or company-endorsed
+  tool.
+- **Deploy is manual, not automatic.** `deploy-app.yml` only runs on
+  manual trigger, not on every push, so publishing to a public GitHub
+  Pages site is a deliberate choice rather than a side effect.
+
+**What isn't solved yet** — genuinely open items, not just disclaimers:
+platform ToS compliance for republishing scraped content, a formal
+GDPR/CCPA legal basis, and the fact that anonymized text can still be
+re-identifying even without a username attached. These are called out
+directly in PRIVACY.md rather than glossed over.
 
 ---
 

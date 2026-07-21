@@ -1,7 +1,7 @@
 """
 Discord source collector for Community Pulse.
 
-Collects messages from designated Everpure community Discord channels.
+Collects messages from designated Pure community Discord channels.
 Uses discord.py when bot token is configured. Falls back gracefully.
 """
 

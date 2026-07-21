@@ -143,17 +143,24 @@ def _keyword_sentiment(text: str) -> dict:
 # ── Competitor Intelligence with Explanation ─────────────────────────
 
 INTEL_SYSTEM_PROMPT = (
-    "You are a competitive intelligence analyst for Everpure, an enterprise storage company. "
+    "You are a competitive intelligence analyst for Pure, an enterprise storage company. "
     "Analyze the given text and respond with a JSON object with these fields:\n"
     "- 'classification': one of 'threat', 'opportunity', or 'neutral'\n"
     "- 'alert_level': integer 1 (neutral), 2 (opportunity), or 3 (threat)\n"
     "- 'entities_detected': list of company/competitor names mentioned\n"
     "- 'explanation': a short 1-2 sentence explanation of WHY this classification was made\n\n"
     "Rules:\n"
-    "- 'threat' = competitor praised, Everpure criticized, or competitor product announcement\n"
-    "- 'opportunity' = competitor criticized, Everpure praised, or migration inquiry TO Everpure\n"
+    "- 'threat' = competitor praised, Pure criticized, or competitor product announcement\n"
+    "- 'opportunity' = competitor criticized, Pure praised, or migration inquiry TO Pure\n"
     "- 'neutral' = no clear competitive signal"
 )
+
+
+# Groq extracts whatever name literally appears in the text (e.g.
+# "everpure", "pure storage") — it doesn't know our internal pseudonym
+# convention. Normalize any variant onto "pure" so entities_detected is
+# consistent regardless of which classification backend produced it.
+_PURE_NAME_VARIANTS = re.compile(r"^(everpure|pure\s?storage|pure)$", re.IGNORECASE)
 
 
 def classify_competitor_intel(text: str, title: str = "") -> dict:
@@ -184,7 +191,10 @@ def classify_competitor_intel(text: str, title: str = "") -> dict:
         try:
             entities = result.get("entities_detected", [])
             if isinstance(entities, list):
-                entities = [str(e).lower() for e in entities]
+                entities = [
+                    "pure" if _PURE_NAME_VARIANTS.match(str(e).strip()) else str(e).lower()
+                    for e in entities
+                ]
             else:
                 entities = []
 
@@ -207,7 +217,7 @@ def _keyword_intel(text: str) -> dict:
     from scripts.transform import competitor_watch
     result = competitor_watch(text)
     if result["classification"] == "threat":
-        explanation = f"Competitor praise or Everpure criticism detected involving: {', '.join(result['entities_detected'])}."
+        explanation = f"Competitor praise or Pure criticism detected involving: {', '.join(result['entities_detected'])}."
     elif result["classification"] == "opportunity":
         explanation = f"Competitor criticism or migration inquiry detected involving: {', '.join(result['entities_detected'])}."
     else:

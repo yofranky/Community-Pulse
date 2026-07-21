@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
 from datetime import datetime, timedelta, timezone
 from typing import Any
@@ -109,8 +110,38 @@ SOURCE_BIAS_MAP: dict[str, int] = {
 # 1. Preserve privacy (no PII stored in the repo)
 # 2. Enable author tracking (same person = same hash across signals)
 #    so we can detect repeat positive/negative contributors
-# 3. Use a fixed salt to prevent rainbow table attacks
-AUTHOR_HASH_SALT = "community-pulse-v1"
+# 3. Use a secret salt to prevent rainbow-table reversal
+#
+# IMPORTANT: the salt must come from an environment secret, not a literal
+# in this file. A hardcoded salt provides no protection at all — anyone
+# who can read this (public/committed) source can recompute the hash for
+# any candidate username in milliseconds. Set ANON_SALT as a GitHub
+# Actions secret (generate with `openssl rand -hex 32`).
+AUTHOR_HASH_SALT = os.getenv("ANON_SALT")
+if not AUTHOR_HASH_SALT:
+    if os.getenv("GITHUB_ACTIONS") == "true" and os.getenv("COMMUNITY_PULSE_DRY_RUN") != "1":
+        # Hard-fail in CI (except dry runs, which don't publish anything —
+        # this matters because pull_request workflows from forks don't get
+        # access to repo secrets, so a dry-run PR check needs to still pass).
+        raise SystemExit(
+            "[transform] FATAL: ANON_SALT is not set. Refusing to run in "
+            "CI without it — add ANON_SALT as a GitHub Actions secret "
+            "(Settings > Secrets and variables > Actions). "
+            "Generate one with: openssl rand -hex 32"
+        )
+    AUTHOR_HASH_SALT = "local-dev-only-not-secure"
+    print(
+        "[transform] WARNING: ANON_SALT not set in environment. Using an "
+        "insecure default salt. Set ANON_SALT as a secret before deploying, "
+        "or author hashes will be crackable via rainbow table."
+    )
+
+# Sources whose `author` values represent real, individual community
+# members (rather than official/first-party accounts) and therefore get
+# hashed. Official sources are left attributed since they're not private
+# individuals — keep this in sync with the `source` values rss_scraper.py
+# assigns per feed.
+COMMUNITY_SOURCES = {"reddit", "discord", "github_discussions"}
 
 
 def content_fingerprint(text: str) -> str:
@@ -143,6 +174,14 @@ def normalize_jargon(text: str) -> str:
 def is_boilerplate(text: str) -> bool:
     """Check if text matches known boilerplate/noise patterns."""
     text_lower = text.strip().lower()
+    # An empty/missing field (e.g. rss_scraper.py doesn't set `title`) isn't
+    # boilerplate — it's just absent. MIN_CONTENT_LENGTH already catches
+    # genuinely empty signals; don't double-penalize a missing title against
+    # otherwise-valid content. Without this guard, is_boilerplate("") matches
+    # the `^\s*$` pattern and every RSS-collected signal (which has no title
+    # field) gets silently dropped as "noise" during cleaning.
+    if not text_lower:
+        return False
     for pattern in BOILERPLATE_PATTERNS:
         if re.match(pattern, text_lower):
             return True
@@ -327,7 +366,11 @@ def prune_old_signals(signals: list[dict], max_age_days: int = DATA_RETENTION_DA
 # classifies signals as Threat, Opportunity, or Neutral.
 
 COMPETITOR_PATTERNS: dict[str, re.Pattern] = {
-    "everpure": re.compile(r"\b(everpure|pure\s?storage)\b", re.IGNORECASE),
+    # "pure" is our internal label for the real company this project tracks.
+    # The regex itself still has to match the real company's actual current
+    # and former names as they appear in scraped text — only the label used
+    # in entities_detected / UI output is pseudonymized. See PRIVACY.md.
+    "pure": re.compile(r"\b(everpure|pure\s?storage)\b", re.IGNORECASE),
     "netapp": re.compile(r"\bnetapp\b", re.IGNORECASE),
     "dell": re.compile(r"\bdell\b", re.IGNORECASE),
     "dell_emc": re.compile(r"\bdell[-\s]?emc\b", re.IGNORECASE),
@@ -336,8 +379,40 @@ COMPETITOR_PATTERNS: dict[str, re.Pattern] = {
     "ibm": re.compile(r"\bibm\b", re.IGNORECASE),
     "hitachi": re.compile(r"\bhitachi\b", re.IGNORECASE),
     "nutanix": re.compile(r"\bnutanix\b", re.IGNORECASE),
-    "pure_storage": re.compile(r"\bpure\s?storage\b", re.IGNORECASE),
 }
+
+# ── Brand Collision Disambiguation ─────────────────────────────────
+# The real company's current name is shared by two unrelated businesses:
+# an enterprise storage vendor, and a decades-old commercial water-
+# filtration brand. Any match scraped from the open web could be about
+# either one. We disambiguate using surrounding context rather than
+# assuming every hit is about us — misattributing water-filter chatter
+# as storage "competitor intel" would poison the sentiment numbers with
+# noise.
+PURE_WATER_FILTER_CONTEXT = re.compile(
+    r"\b(water\s?filter|filtration|cartridge|foodservice|food\s?service|"
+    r"restaurant|kitchen|ice\s?machine|espresso|coffee|beverage|faucet|"
+    r"nsf\s?certif|pentair|drinking\s?water|tap\s?water)\b",
+    re.IGNORECASE,
+)
+PURE_STORAGE_CONTEXT = re.compile(
+    r"\b(storage|flash|array|nvme|iops|latency|throughput|kubernetes|"
+    r"cloud|data\s?management|backup|replication|purity|evergreen|"
+    r"portworx|san\b|nas\b|enterprise\s?data)\b",
+    re.IGNORECASE,
+)
+
+
+def _is_probably_wrong_pure(combined_text: str) -> bool:
+    """
+    Return True if a "pure" mention is more likely about the water-filter
+    brand than the storage company, based on surrounding keyword context.
+    Ambiguous or storage-flavored text is given the benefit of the doubt
+    and treated as ours (False).
+    """
+    has_water_context = bool(PURE_WATER_FILTER_CONTEXT.search(combined_text))
+    has_storage_context = bool(PURE_STORAGE_CONTEXT.search(combined_text))
+    return has_water_context and not has_storage_context
 
 PRAISE_PATTERNS = re.compile(
     r"\b(great|excellent|amazing|best[-\s]?in[-\s]?class|leader|outperform|"
@@ -365,6 +440,9 @@ def competitor_watch(text: str, title: str = "") -> dict:
     """
     Scan text for competitor mentions and classify the competitive signal.
 
+    This is also used as the keyword-based fallback in scripts/slm.py when
+    the Groq API is unavailable.
+
     Args:
         text: Main content body to scan
         title: Optional title to scan as well
@@ -381,8 +459,14 @@ def competitor_watch(text: str, title: str = "") -> dict:
 
     # Step 1: Find which entities are mentioned
     for name, pattern in COMPETITOR_PATTERNS.items():
-        if pattern.search(combined):
-            entities_detected.append(name)
+        if not pattern.search(combined):
+            continue
+        # Brand-collision guard: a "pure" hit that reads like it's about
+        # the water-filter brand, not us, gets skipped rather than
+        # counted as a self-mention.
+        if name == "pure" and _is_probably_wrong_pure(combined):
+            continue
+        entities_detected.append(name)
 
     if not entities_detected:
         return {
@@ -397,19 +481,19 @@ def competitor_watch(text: str, title: str = "") -> dict:
     has_criticism = bool(CRITICISM_PATTERNS.search(combined))
     has_inquiry = bool(INQUIRY_PATTERNS.search(combined))
 
-    # Determine if Everpure/Pure is one of the entities mentioned
-    everpure_mentioned = "everpure" in entities_detected or "pure_storage" in entities_detected
-    competitor_entities = [e for e in entities_detected if e not in ("everpure", "pure_storage")]
+    # Determine if we (Pure) are one of the entities mentioned
+    pure_mentioned = "pure" in entities_detected
+    competitor_entities = [e for e in entities_detected if e != "pure"]
 
     # ── Classification Logic ────────────────────────────────────
-    # Threat: Competitor praised OR Everpure criticized
+    # Threat: Competitor praised OR we're criticized
     if (competitor_entities and has_praise and not has_criticism) or \
-       (everpure_mentioned and has_criticism and not has_praise):
+       (pure_mentioned and has_criticism and not has_praise):
         classification = "threat"
         alert_level = 3
-    # Opportunity: Competitor criticized OR Everpure praised OR migration inquiry
+    # Opportunity: Competitor criticized OR we're praised OR migration inquiry
     elif (competitor_entities and has_criticism and not has_praise) or \
-         (everpure_mentioned and has_praise and not has_criticism) or \
+         (pure_mentioned and has_praise and not has_criticism) or \
          (has_inquiry and competitor_entities):
         classification = "opportunity"
         alert_level = 2
@@ -471,15 +555,17 @@ def normalize_signal(raw: dict, source: str) -> dict | None:
     if isinstance(date_str, (int, float)):
         date_str = datetime.fromtimestamp(date_str, tz=timezone.utc).isoformat()
 
-    # Hash the author name (privacy-by-design, preserves tracking)
+    # Hash the author name (privacy-by-design, preserves tracking).
+    # Only community sources (real individuals) get hashed — official
+    # first-party accounts (blog, engineering, etc.) are left attributed.
     raw_author = raw.get("author", "anonymous")
-    if raw_author and raw_author != "anonymous":
+    if raw_author and raw_author != "anonymous" and source in COMMUNITY_SOURCES:
         hashed = hashlib.sha256(
-            f"{AUTHOR_HASH_SALT}:{raw_author}".encode()
+            f"{AUTHOR_HASH_SALT}:{source}:{raw_author}".encode()
         ).hexdigest()[:16]
         author = f"usr_{hashed}"
     else:
-        author = "anonymous"
+        author = raw_author
 
     return {
         "id": signal_id,
@@ -597,7 +683,15 @@ def transform(
         if signals:
             sources_aggregated.append(source)
         for raw in signals:
-            signal = normalize_signal(raw, source)
+            # Prefer the signal's own `source` field (set per-entry by
+            # rss_scraper.py, which aggregates many feeds — reddit,
+            # netapp_community, dell_infohub, blog, engineering, etc. —
+            # under one registry key "rss"). Without this, every
+            # RSS-sourced signal collapses to source="rss" and
+            # SOURCE_BIAS_MAP lookups (keyed on "netapp_community" /
+            # "dell_infohub") never match.
+            effective_source = raw.get("source", source)
+            signal = normalize_signal(raw, effective_source)
             if signal:
                 content = signal.get("content_preview", "")
                 title = raw.get("title", "")
@@ -619,26 +713,26 @@ def transform(
                             diff_seconds = (current_dt - earliest_dt).total_seconds()
                             if 0 <= diff_seconds <= CROSS_SOURCE_DEDUP_WINDOW:
                                 print(f"[dedup] Cross-source duplicate suppressed: "
-                                      f"'{source}' matches '{earliest_source}' "
+                                      f"'{effective_source}' matches '{earliest_source}' "
                                       f"(fingerprint: {fingerprint})")
                                 continue
                         except (ValueError, TypeError):
                             pass
 
-                seen_fingerprints[fingerprint] = (signal_date, source)
+                seen_fingerprints[fingerprint] = (signal_date, effective_source)
 
                 # ── Competitor watch with SLM (includes explanation) ──
                 intel = classify_competitor_intel(content, title)
                 if intel["alert_level"] > 1:
                     # Apply source bias penalty: competitor-owned channels
                     # get +1 to alert_level (their self-praise is expected)
-                    bias = SOURCE_BIAS_MAP.get(source, 0)
+                    bias = SOURCE_BIAS_MAP.get(effective_source, 0)
                     if bias > 0 and intel["classification"] == "threat":
                         # Downgrade biased threat to opportunity
                         intel["alert_level"] = 2
                         intel["classification"] = "opportunity"
                         intel["source_bias_applied"] = True
-                        print(f"[intel] BIAS ADJUSTED: {source} self-praise "
+                        print(f"[intel] BIAS ADJUSTED: {effective_source} self-praise "
                               f"downgraded to opportunity")
                     signal["competitor_intel"] = intel
                     print(f"[intel] {intel['classification'].upper()}: "
@@ -683,18 +777,18 @@ if __name__ == "__main__":
                 "title": "NVMe-oF Performance Deep Dive",
                 "content_preview": "In this post we explore NVMe over Fabrics performance characteristics for all-flash arrays. Our QLC-based systems achieve 2M IOPS with sub-100μs latency.",
                 "date": "2026-07-19T10:00:00Z",
-                "author": "everpure_eng",
+                "author": "pure_eng",
                 "tags": ["nvme-of", "performance", "all-flash"],
             },
             {
                 "title": "NVMe-oF Performance Deep Dive",  # duplicate
                 "content_preview": "In this post we explore NVMe over Fabrics performance characteristics for all-flash arrays.",
                 "date": "2026-07-19T10:00:00Z",
-                "author": "everpure_eng",
+                "author": "pure_eng",
             },
             {
                 "title": "Subscribe to our newsletter",  # boilerplate
-                "content_preview": "Sign up for the latest updates from Everpure.",
+                "content_preview": "Sign up for the latest updates from Pure.",
                 "date": "2026-07-19T12:00:00Z",
             },
         ],
