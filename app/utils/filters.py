@@ -90,11 +90,40 @@ def render_date_range_picker(df: pd.DataFrame, location=st.sidebar) -> tuple:
         st.session_state[SESSION_KEY_END] = end_date
         st.rerun()
 
-    return pd.Timestamp(start_date), pd.Timestamp(end_date) + pd.Timedelta(days=1)
+    # `st.date_input` returns plain (timezone-naive) datetime.date objects,
+    # but signals_to_dataframe() parses `date` as UTC-aware (the source
+    # timestamps end in "Z"). Comparing a tz-naive Timestamp against a
+    # tz-aware Series raises TypeError in pandas — localize to UTC here so
+    # apply_date_range() always compares like-for-like.
+    return (
+        pd.Timestamp(start_date, tz="UTC"),
+        pd.Timestamp(end_date, tz="UTC") + pd.Timedelta(days=1),
+    )
 
 
 def apply_date_range(df: pd.DataFrame, start, end) -> pd.DataFrame:
     """Filter a signals DataFrame to the given [start, end) date range."""
     if df.empty or start is None or end is None or "date" not in df.columns:
         return df
+
+    # Defensive tz alignment: match start/end's tz-awareness to whatever
+    # df["date"] actually is, rather than assuming UTC. Prevents the
+    # "Invalid comparison between dtype=datetime64[ns, UTC] and Timestamp"
+    # error if the data's tz-awareness ever changes upstream.
+    df_tz = getattr(df["date"].dtype, "tz", None)
+    if df_tz is not None:
+        if start.tzinfo is None:
+            start = start.tz_localize(df_tz)
+        else:
+            start = start.tz_convert(df_tz)
+        if end.tzinfo is None:
+            end = end.tz_localize(df_tz)
+        else:
+            end = end.tz_convert(df_tz)
+    else:
+        if start.tzinfo is not None:
+            start = start.tz_localize(None)
+        if end.tzinfo is not None:
+            end = end.tz_localize(None)
+
     return df[(df["date"] >= start) & (df["date"] < end)]
