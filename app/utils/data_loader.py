@@ -123,7 +123,39 @@ def get_filtered_signals(df: pd.DataFrame, filter_mode: str) -> pd.DataFrame:
         return df
 
 
-def get_summary_stats(data: dict) -> dict[str, Any]:
+def generate_briefing(intel_stats: dict[str, Any], top_signal: dict | None) -> str:
+    """
+    Build a plain-language "what do I need to know today" summary — the
+    single highest-value thing a community manager should see on landing,
+    ahead of any KPI tiles or charts.
+
+    Args:
+        intel_stats: dict from get_intel_stats()
+        top_signal: the single highest-severity signal as a dict (or None),
+            expected to have 'classification' and 'source' keys at least
+
+    Returns:
+        A short, plain-English sentence or two — no jargon.
+    """
+    threats = intel_stats.get("active_threats", 0)
+    opportunities = intel_stats.get("migration_opportunities", 0)
+
+    if threats == 0 and opportunities == 0:
+        return "Nothing urgent in this range — a quiet stretch. Good time to catch up on trends."
+
+    bits = []
+    if threats:
+        bits.append(f"{threats} threat{'s' if threats != 1 else ''} to review")
+    if opportunities:
+        bits.append(f"{opportunities} opportunit{'ies' if opportunities != 1 else 'y'} worth following up")
+    summary = " and ".join(bits)
+
+    if top_signal is not None:
+        kind = "threat" if top_signal.get("classification") == "threat" else "opportunity"
+        source = top_signal.get("source", "a community source")
+        return f"Today: {summary}. Top priority is a {kind} from {source} — see below."
+
+    return f"Today: {summary}."
     """Extract key summary stats for dashboard KPI cards."""
     meta = data.get("meta", {})
     summary = data.get("summary", {})

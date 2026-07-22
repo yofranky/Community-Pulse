@@ -119,6 +119,35 @@ def inject_css() -> None:
                 border-color: {BORDER} !important;
             }}
             a {{ color: {ORANGE} !important; }}
+
+            /* Sidebar accent stripe — single motorsport nod, not repeated
+               elsewhere. A glossy gradient rather than flat color so it
+               reads as a considered accent, not a flat bar. */
+            .pulse-stripe {{
+                height: 4px;
+                width: 100%;
+                margin: -1rem 0 16px -1rem;
+                width: calc(100% + 2rem);
+                background: linear-gradient(100deg,
+                    {ORANGE} 0%, #FF8A50 35%, {ORANGE} 55%, #B33800 100%);
+            }}
+
+            /* Telemetry sweep — thin animated highlight, used once under
+               the date-range picker to signal "live" without being a
+               gimmick. Pure CSS, no JS. */
+            @keyframes telemetry-sweep {{
+                0%   {{ background-position: -120% 0; }}
+                100% {{ background-position: 220% 0; }}
+            }}
+            .telemetry-sweep-bar {{
+                height: 2px;
+                border-radius: 2px;
+                margin: 4px 0 14px 0;
+                background: linear-gradient(90deg,
+                    transparent 0%, {BORDER} 35%, {ORANGE} 50%, {BORDER} 65%, transparent 100%);
+                background-size: 300% 100%;
+                animation: telemetry-sweep 3.2s linear infinite;
+            }}
         </style>
         """,
         unsafe_allow_html=True,
@@ -126,7 +155,8 @@ def inject_css() -> None:
 
 
 def render_sidebar_wordmark() -> None:
-    """Render the pulse mark + product wordmark at the top of the sidebar."""
+    """Render the accent stripe + pulse mark + product wordmark at the top of the sidebar."""
+    st.markdown('<div class="pulse-stripe"></div>', unsafe_allow_html=True)
     st.markdown(
         f"""
         <div style="display:flex; align-items:center; gap:12px; margin-bottom:4px;">
@@ -143,6 +173,11 @@ def render_sidebar_wordmark() -> None:
         """,
         unsafe_allow_html=True,
     )
+
+
+def render_telemetry_sweep() -> None:
+    """Render the thin animated 'live' sweep bar. Use sparingly — once per page, max."""
+    st.markdown('<div class="telemetry-sweep-bar"></div>', unsafe_allow_html=True)
 
 
 def render_page_title(title: str, subtitle: str = "") -> None:

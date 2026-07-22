@@ -12,6 +12,8 @@ from datetime import timedelta
 import pandas as pd
 import streamlit as st
 
+from app.utils.theme import render_telemetry_sweep
+
 SESSION_KEY_START = "pulse_date_start"
 SESSION_KEY_END = "pulse_date_end"
 
@@ -68,6 +70,8 @@ def render_date_range_picker(df: pd.DataFrame, location=st.sidebar) -> tuple:
 
     st.session_state[SESSION_KEY_START] = start_date
     st.session_state[SESSION_KEY_END] = end_date
+
+    render_telemetry_sweep()
 
     quick_col1, quick_col2, quick_col3 = location.columns(3)
     if quick_col1.button("7d", use_container_width=True):

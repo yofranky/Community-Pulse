@@ -24,9 +24,9 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 import streamlit as st
 
 from app.components import dashboard, timeline
-from app.utils.data_loader import get_filtered_signals, get_intel_stats, load_data, signals_to_dataframe
+from app.utils.data_loader import generate_briefing, get_filtered_signals, get_intel_stats, load_data, signals_to_dataframe
 from app.utils.filters import apply_date_range, render_date_range_picker
-from app.utils.theme import GREEN, MUTED, ORANGE, SURFACE, TEXT, inject_css, render_page_title, render_sidebar_wordmark
+from app.utils.theme import BORDER, GREEN, MUTED, ORANGE, SURFACE, TEXT, inject_css, render_page_title, render_sidebar_wordmark
 
 st.set_page_config(
     page_title="Community Pulse — Pure Intelligence Console",
@@ -116,8 +116,43 @@ filter_map = {
 filtered_df = get_filtered_signals(df, filter_map[filter_mode])
 filtered_df = apply_date_range(filtered_df, start, end)
 
-# ── Top 3 KPIs ──────────────────────────────────────────────────────
+# ── Today's Briefing ────────────────────────────────────────────────
+# The single highest-value thing on this page: what does the community
+# manager need to know before anything else loads.
 intel_stats = get_intel_stats(filtered_df)
+
+top_signal_row = None
+if not filtered_df.empty:
+    _top = filtered_df[filtered_df["alert_level"] > 1].sort_values(
+        ["alert_level", "date"], ascending=[False, False]
+    ).head(1)
+    if not _top.empty:
+        top_signal_row = _top.iloc[0].to_dict()
+
+briefing_text = generate_briefing(intel_stats, top_signal_row)
+
+st.markdown(
+    f"""
+    <div style="
+        background: linear-gradient(100deg, {SURFACE} 0%, {SURFACE} 70%, #1A0F08 100%);
+        border: 1px solid {BORDER};
+        border-left: 3px solid {ORANGE};
+        border-radius: 6px;
+        padding: 16px 20px;
+        margin-bottom: 20px;
+    ">
+        <p style="margin:0; font-size:11px; color:{MUTED}; text-transform:uppercase; letter-spacing:0.8px; font-family:'IBM Plex Mono',monospace;">
+            Today's Briefing
+        </p>
+        <p style="margin:6px 0 0 0; font-size:16px; color:{TEXT}; line-height:1.5;">
+            {briefing_text}
+        </p>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+# ── Top 3 KPIs ──────────────────────────────────────────────────────
 dashboard.render(intel_stats)
 
 st.divider()
