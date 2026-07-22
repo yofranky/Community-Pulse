@@ -162,6 +162,22 @@ INTEL_SYSTEM_PROMPT = (
 # consistent regardless of which classification backend produced it.
 _PURE_NAME_VARIANTS = re.compile(r"^(everpure|pure\s?storage|pure)$", re.IGNORECASE)
 
+# Free-text fields (the LLM's own explanation, and raw excerpts pulled
+# from source content) aren't structured the way entities_detected is —
+# they can contain the real company name verbatim if it appears in the
+# scraped text or if the model quotes it directly, even though the
+# system prompt establishes "Pure" as the identity. Scrub these before
+# they reach data.json / the dashboard, same as everywhere else in this
+# codebase that avoids displaying the real trademarked name.
+_PURE_NAME_INLINE = re.compile(r"\b(everpure|pure\s?storage)\b", re.IGNORECASE)
+
+
+def _scrub_pure_name(text: str) -> str:
+    """Replace any literal mention of the real company name with 'Pure'."""
+    if not text:
+        return text
+    return _PURE_NAME_INLINE.sub("Pure", text)
+
 
 def classify_competitor_intel(text: str, title: str = "") -> dict:
     """
@@ -202,8 +218,8 @@ def classify_competitor_intel(text: str, title: str = "") -> dict:
                 "classification": str(result.get("classification", "neutral")),
                 "alert_level": max(1, min(3, int(result.get("alert_level", 1)))),
                 "entities_detected": sorted(set(entities)),
-                "explanation": str(result.get("explanation", "Groq API classification.")),
-                "signal_text": truncated[:200],
+                "explanation": _scrub_pure_name(str(result.get("explanation", "Groq API classification."))),
+                "signal_text": _scrub_pure_name(truncated[:200]),
             }
         except (ValueError, TypeError):
             pass

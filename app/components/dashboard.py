@@ -1,7 +1,7 @@
 """
 Dashboard component for Community Pulse.
 
-Renders intelligence-focused KPI cards at the top of the dashboard:
+Renders intelligence-focused KPI "readout tiles":
 - Active Threats (alert_level == 3)
 - Migration Opportunities (classification == "opportunity")
 - New Technical Mentions (engineering/blog/cloud_native in last 7 days)
@@ -9,9 +9,33 @@ Renders intelligence-focused KPI cards at the top of the dashboard:
 
 import streamlit as st
 
+from app.utils.theme import BORDER, GREEN, MUTED, ORANGE, SURFACE, TEXT
+
+
+def _tile(label: str, value, caption: str, color: str, icon: str) -> str:
+    return f"""
+        <div style="
+            background: {SURFACE};
+            border: 1px solid {BORDER};
+            border-left: 3px solid {color};
+            border-radius: 6px;
+            padding: 18px 18px 16px 16px;
+        ">
+            <p style="margin:0; font-size:12px; color:{MUTED}; font-weight:600; text-transform:uppercase; letter-spacing:0.6px; font-family:'IBM Plex Sans',sans-serif;">
+                {icon} {label}
+            </p>
+            <p style="margin:6px 0 0 0; font-size:38px; font-weight:700; color:{color}; font-family:'IBM Plex Mono',monospace;">
+                {value}
+            </p>
+            <p style="margin:4px 0 0 0; font-size:12px; color:{MUTED};">
+                {caption}
+            </p>
+        </div>
+        """
+
 
 def render(intel_stats: dict):
-    """Render intelligence KPI summary cards.
+    """Render intelligence KPI readout tiles.
 
     Args:
         intel_stats: dict from get_intel_stats() with keys:
@@ -22,75 +46,36 @@ def render(intel_stats: dict):
 
     with col1:
         st.markdown(
-            f"""
-            <div style="
-                background: #FFFFFF;
-                border: 1px solid #E5E7EB;
-                border-left: 4px solid #DC2626;
-                border-radius: 8px;
-                padding: 16px;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            ">
-                <p style="margin:0; font-size:14px; color:#6B7280; font-weight:500;">
-                    🚨 Active Threats
-                </p>
-                <p style="margin:4px 0 0 0; font-size:32px; font-weight:700; color:#DC2626;">
-                    {intel_stats['active_threats']}
-                </p>
-                <p style="margin:2px 0 0 0; font-size:12px; color:#9CA3AF;">
-                    Competitor praise or Pure criticism
-                </p>
-            </div>
-            """,
+            _tile(
+                "Active Threats",
+                intel_stats["active_threats"],
+                "Competitor praise or Pure criticism",
+                ORANGE,
+                "▲",
+            ),
             unsafe_allow_html=True,
         )
 
     with col2:
         st.markdown(
-            f"""
-            <div style="
-                background: #FFFFFF;
-                border: 1px solid #E5E7EB;
-                border-left: 4px solid #16A34A;
-                border-radius: 8px;
-                padding: 16px;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            ">
-                <p style="margin:0; font-size:14px; color:#6B7280; font-weight:500;">
-                    💡 Migration Opportunities
-                </p>
-                <p style="margin:4px 0 0 0; font-size:32px; font-weight:700; color:#16A34A;">
-                    {intel_stats['migration_opportunities']}
-                </p>
-                <p style="margin:2px 0 0 0; font-size:12px; color:#9CA3AF;">
-                    User inquiries and competitor criticism
-                </p>
-            </div>
-            """,
+            _tile(
+                "Migration Opportunities",
+                intel_stats["migration_opportunities"],
+                "User inquiries and competitor criticism",
+                GREEN,
+                "●",
+            ),
             unsafe_allow_html=True,
         )
 
     with col3:
         st.markdown(
-            f"""
-            <div style="
-                background: #FFFFFF;
-                border: 1px solid #E5E7EB;
-                border-left: 4px solid #1B2A4A;
-                border-radius: 8px;
-                padding: 16px;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            ">
-                <p style="margin:0; font-size:14px; color:#6B7280; font-weight:500;">
-                    🔬 New Technical Mentions
-                </p>
-                <p style="margin:4px 0 0 0; font-size:32px; font-weight:700; color:#1B2A4A;">
-                    {intel_stats['new_technical_mentions']}
-                </p>
-                <p style="margin:2px 0 0 0; font-size:12px; color:#9CA3AF;">
-                    Engineering & cloud-native signals (7 days)
-                </p>
-            </div>
-            """,
+            _tile(
+                "New Technical Mentions",
+                intel_stats["new_technical_mentions"],
+                "Engineering & cloud-native signals (7 days)",
+                TEXT,
+                "■",
+            ),
             unsafe_allow_html=True,
         )

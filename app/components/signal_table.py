@@ -2,14 +2,23 @@
 Signal Triage Table component for Community Pulse.
 
 Renders a scrollable table of Threats and Opportunities with:
-- Color-coded rows (red tint for Level 3 Threats, green tint for Level 2 Opportunities)
+- A left-border status stripe per row (Threat = orange, Opportunity = green)
+- Outline-chip badges (color + text, never color-only — accessibility)
 - Clickable source URLs
-- Alert level badges
-- Classification tags
 - Explanation tooltip for audit trail
 """
 
 import streamlit as st
+
+from app.utils.theme import BORDER, GREEN, MUTED, ORANGE, SURFACE, SURFACE_2, TEXT
+
+
+def _chip(text: str, color: str) -> str:
+    return (
+        f'<span style="background:{color}1F; color:{color}; border:1px solid {color}4D; '
+        f'padding:2px 9px; border-radius:3px; font-size:11px; font-weight:600; '
+        f'font-family:\'IBM Plex Mono\',monospace; white-space:nowrap;">{text}</span>'
+    )
 
 
 def render(df):
@@ -20,23 +29,19 @@ def render(df):
         st.info("No signals to display.")
         return
 
-    # Filter to only threats and opportunities
     triage_df = df[df["alert_level"] > 1].copy()
 
     if triage_df.empty:
         st.info("No active threats or opportunities to triage.")
         return
 
-    # Sort by alert_level descending (threats first), then by date descending
     triage_df = triage_df.sort_values(
         ["alert_level", "date"], ascending=[False, False]
     )
 
-    # Build HTML table rows
     rows_html = ""
     for _, row in triage_df.iterrows():
         alert_level = int(row.get("alert_level", 1))
-        classification = row.get("classification", "neutral")
         source = row.get("source", "unknown")
         topic = row.get("topic", "general")
         date_str = row.get("date", "")
@@ -50,85 +55,55 @@ def render(df):
         entities = row.get("entities_detected", "")
         explanation = row.get("explanation", "")
 
-        # Determine row background color
         if alert_level == 3:
-            row_bg = "rgba(220, 38, 38, 0.06)"
-            level_badge = (
-                '<span style="'
-                "background:#FEE2E2; color:#DC2626; "
-                "padding:2px 8px; border-radius:12px; "
-                "font-size:12px; font-weight:600;"
-                '">Level 3</span>'
-            )
-            class_badge = (
-                '<span style="'
-                "background:#FEE2E2; color:#DC2626; "
-                "padding:2px 8px; border-radius:12px; "
-                "font-size:11px; font-weight:500;"
-                '">Threat</span>'
-            )
+            stripe_color = ORANGE
+            level_badge = _chip("Level 3", ORANGE)
+            class_badge = _chip("▲ Threat", ORANGE)
         elif alert_level == 2:
-            row_bg = "rgba(22, 163, 74, 0.06)"
-            level_badge = (
-                '<span style="'
-                "background:#DCFCE7; color:#16A34A; "
-                "padding:2px 8px; border-radius:12px; "
-                "font-size:12px; font-weight:600;"
-                '">Level 2</span>'
-            )
-            class_badge = (
-                '<span style="'
-                "background:#DCFCE7; color:#16A34A; "
-                "padding:2px 8px; border-radius:12px; "
-                "font-size:11px; font-weight:500;"
-                '">Opportunity</span>'
-            )
+            stripe_color = GREEN
+            level_badge = _chip("Level 2", GREEN)
+            class_badge = _chip("● Opportunity", GREEN)
         else:
-            row_bg = "transparent"
+            stripe_color = BORDER
             level_badge = ""
             class_badge = ""
 
-        # Build link
         if source_url:
             link_html = (
                 f'<a href="{source_url}" target="_blank" '
-                f'style="color:#1B2A4A; text-decoration:none; font-size:13px;">'
-                f'🔗 View</a>'
+                f'style="color:{ORANGE}; text-decoration:none; font-size:13px;">'
+                f'View →</a>'
             )
         else:
-            link_html = '<span style="color:#9CA3AF; font-size:13px;">—</span>'
+            link_html = f'<span style="color:{MUTED}; font-size:13px;">—</span>'
 
-        # Entities tag
         if entities:
             entities_html = (
-                f'<span style="'
-                f"background:#F3F4F6; color:#374151; "
-                f"padding:2px 6px; border-radius:4px; "
-                f"font-size:11px; font-weight:500;"
-                f'">{entities}</span>'
+                f'<span style="background:{SURFACE_2}; color:{TEXT}; '
+                f'padding:2px 6px; border-radius:4px; '
+                f'font-size:11px; font-weight:500; font-family:\'IBM Plex Mono\',monospace;">{entities}</span>'
             )
         else:
             entities_html = ""
 
-        # Explanation tooltip
         if explanation:
             explanation_html = (
                 f'<span title="{explanation}" style="'
-                f"border-bottom:1px dotted #9CA3AF; cursor:help;"
-                f'">{explanation[:60]}{"..." if len(explanation) > 60 else ""}</span>'
+                f'border-bottom:1px dotted {MUTED}; cursor:help; color:{MUTED};">'
+                f'{explanation[:60]}{"..." if len(explanation) > 60 else ""}</span>'
             )
         else:
             explanation_html = "—"
 
         rows_html += f"""
-        <tr style="background:{row_bg}; border-bottom:1px solid #F3F4F6;">
-            <td style="padding:10px 12px; font-size:13px; color:#6B7280; white-space:nowrap;">
+        <tr style="background:{SURFACE}; border-bottom:1px solid {BORDER}; border-left:3px solid {stripe_color};">
+            <td style="padding:10px 12px; font-size:13px; color:{MUTED}; white-space:nowrap; font-family:'IBM Plex Mono',monospace;">
                 {date_str}
             </td>
-            <td style="padding:10px 12px; font-size:13px; color:#374151; font-weight:500;">
+            <td style="padding:10px 12px; font-size:13px; color:{TEXT}; font-weight:500;">
                 {source}
             </td>
-            <td style="padding:10px 12px; font-size:13px; color:#374151;">
+            <td style="padding:10px 12px; font-size:13px; color:{TEXT};">
                 {topic.replace('_', ' ').title()}
             </td>
             <td style="padding:10px 12px; text-align:center;">
@@ -137,13 +112,13 @@ def render(df):
             <td style="padding:10px 12px; text-align:center;">
                 {class_badge}
             </td>
-            <td style="padding:10px 12px; font-size:12px; color:#6B7280; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+            <td style="padding:10px 12px; font-size:12px; color:{MUTED}; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
                 {entities_html}
             </td>
-            <td style="padding:10px 12px; font-size:12px; color:#6B7280; max-width:250px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+            <td style="padding:10px 12px; font-size:12px; color:{MUTED}; max-width:250px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
                 {content_preview}
             </td>
-            <td style="padding:10px 12px; font-size:11px; color:#6B7280; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-style:italic;">
+            <td style="padding:10px 12px; font-size:11px; color:{MUTED}; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-style:italic;">
                 {explanation_html}
             </td>
             <td style="padding:10px 12px; text-align:center;">
@@ -156,23 +131,22 @@ def render(df):
     <div style="
         max-height:500px;
         overflow-y:auto;
-        border:1px solid #E5E7EB;
-        border-radius:8px;
-        background:#FFFFFF;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        border:1px solid {BORDER};
+        border-radius:6px;
+        background:{SURFACE};
     ">
-        <table style="width:100%; border-collapse:collapse; font-family:-apple-system,BlinkMacSystemFont,sans-serif;">
+        <table style="width:100%; border-collapse:collapse; font-family:'IBM Plex Sans',sans-serif;">
             <thead style="position:sticky; top:0; z-index:1;">
-                <tr style="background:#F9FAFB; border-bottom:2px solid #E5E7EB;">
-                    <th style="padding:12px; text-align:left; font-size:12px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.5px;">Date</th>
-                    <th style="padding:12px; text-align:left; font-size:12px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.5px;">Source</th>
-                    <th style="padding:12px; text-align:left; font-size:12px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.5px;">Topic</th>
-                    <th style="padding:12px; text-align:center; font-size:12px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.5px;">Level</th>
-                    <th style="padding:12px; text-align:center; font-size:12px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.5px;">Class</th>
-                    <th style="padding:12px; text-align:left; font-size:12px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.5px;">Entities</th>
-                    <th style="padding:12px; text-align:left; font-size:12px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.5px;">Preview</th>
-                    <th style="padding:12px; text-align:left; font-size:12px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.5px;">Why?</th>
-                    <th style="padding:12px; text-align:center; font-size:12px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.5px;">Link</th>
+                <tr style="background:{SURFACE_2}; border-bottom:1px solid {BORDER};">
+                    <th style="padding:12px; text-align:left; font-size:11px; font-weight:600; color:{MUTED}; text-transform:uppercase; letter-spacing:0.6px; font-family:'IBM Plex Mono',monospace;">Date</th>
+                    <th style="padding:12px; text-align:left; font-size:11px; font-weight:600; color:{MUTED}; text-transform:uppercase; letter-spacing:0.6px; font-family:'IBM Plex Mono',monospace;">Source</th>
+                    <th style="padding:12px; text-align:left; font-size:11px; font-weight:600; color:{MUTED}; text-transform:uppercase; letter-spacing:0.6px; font-family:'IBM Plex Mono',monospace;">Topic</th>
+                    <th style="padding:12px; text-align:center; font-size:11px; font-weight:600; color:{MUTED}; text-transform:uppercase; letter-spacing:0.6px; font-family:'IBM Plex Mono',monospace;">Level</th>
+                    <th style="padding:12px; text-align:center; font-size:11px; font-weight:600; color:{MUTED}; text-transform:uppercase; letter-spacing:0.6px; font-family:'IBM Plex Mono',monospace;">Class</th>
+                    <th style="padding:12px; text-align:left; font-size:11px; font-weight:600; color:{MUTED}; text-transform:uppercase; letter-spacing:0.6px; font-family:'IBM Plex Mono',monospace;">Entities</th>
+                    <th style="padding:12px; text-align:left; font-size:11px; font-weight:600; color:{MUTED}; text-transform:uppercase; letter-spacing:0.6px; font-family:'IBM Plex Mono',monospace;">Preview</th>
+                    <th style="padding:12px; text-align:left; font-size:11px; font-weight:600; color:{MUTED}; text-transform:uppercase; letter-spacing:0.6px; font-family:'IBM Plex Mono',monospace;">Why?</th>
+                    <th style="padding:12px; text-align:center; font-size:11px; font-weight:600; color:{MUTED}; text-transform:uppercase; letter-spacing:0.6px; font-family:'IBM Plex Mono',monospace;">Link</th>
                 </tr>
             </thead>
             <tbody>
@@ -184,11 +158,10 @@ def render(df):
 
     st.markdown(table_html, unsafe_allow_html=True)
 
-    # Summary caption
     threat_count = len(triage_df[triage_df["alert_level"] == 3])
     opp_count = len(triage_df[triage_df["alert_level"] == 2])
     st.caption(
         f"Showing {len(triage_df)} signals requiring attention "
         f"({threat_count} threats, {opp_count} opportunities). "
-        "Red tint = Level 3 Threat, Green tint = Level 2 Opportunity."
+        "Orange stripe = Threat, Green stripe = Opportunity."
     )

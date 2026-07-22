@@ -8,6 +8,28 @@ import altair as alt
 import pandas as pd
 import streamlit as st
 
+from app.utils.theme import BORDER, GREEN, MUTED, ORANGE, SURFACE, TEXT
+
+DARK_CHART_CONFIG = {
+    "background": SURFACE,
+    "axis": {
+        "domainColor": BORDER,
+        "gridColor": BORDER,
+        "tickColor": BORDER,
+        "labelColor": MUTED,
+        "titleColor": TEXT,
+        "labelFont": "IBM Plex Sans",
+        "titleFont": "IBM Plex Mono",
+    },
+    "legend": {
+        "labelColor": TEXT,
+        "titleColor": MUTED,
+        "labelFont": "IBM Plex Sans",
+        "titleFont": "IBM Plex Mono",
+    },
+    "view": {"stroke": BORDER},
+}
+
 
 def render(df: pd.DataFrame):
     """Render a topic breakdown chart with sentiment heatmap."""
@@ -17,7 +39,6 @@ def render(df: pd.DataFrame):
         st.info("No signal data available.")
         return
 
-    # Aggregate by topic
     topic_stats = (
         df.groupby("topic")
         .agg(
@@ -31,7 +52,6 @@ def render(df: pd.DataFrame):
     topic_stats["avg_sentiment"] = topic_stats["avg_sentiment"].round(4)
     topic_stats["topic_label"] = topic_stats["topic"].str.replace("_", " ").str.title()
 
-    # Bar chart: count per topic, colored by avg sentiment
     bar_chart = (
         alt.Chart(topic_stats)
         .mark_bar()
@@ -43,7 +63,7 @@ def render(df: pd.DataFrame):
                 title="Avg Sentiment",
                 scale=alt.Scale(
                     domain=[-1.0, 0, 1.0],
-                    range=["#e74c3c", "#f39c12", "#2ecc71"],
+                    range=[ORANGE, MUTED, GREEN],
                 ),
                 legend=alt.Legend(format=".2f"),
             ),
@@ -54,12 +74,12 @@ def render(df: pd.DataFrame):
             ],
         )
         .properties(height=300)
+        .configure(**DARK_CHART_CONFIG)
         .interactive()
     )
 
     st.altair_chart(bar_chart, use_container_width=True)
 
-    # Data table below
     with st.expander("View raw topic data"):
         st.dataframe(
             topic_stats[["topic_label", "count", "avg_sentiment"]].rename(
@@ -73,4 +93,4 @@ def render(df: pd.DataFrame):
             hide_index=True,
         )
 
-    st.caption("Bar color = average sentiment (red = negative, yellow = neutral, green = positive).")
+    st.caption("Bar color = average sentiment (orange = negative, gray = neutral, green = positive).")

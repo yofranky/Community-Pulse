@@ -414,6 +414,22 @@ def _is_probably_wrong_pure(combined_text: str) -> bool:
     has_storage_context = bool(PURE_STORAGE_CONTEXT.search(combined_text))
     return has_water_context and not has_storage_context
 
+
+# Raw content excerpts (signal_text) are literal slices of scraped text,
+# so they can contain the real company name verbatim even though entity
+# labels are normalized to "pure". Scrub before this reaches data.json —
+# same reasoning as everywhere else in this codebase that avoids
+# displaying the real trademarked name in human-facing output. Kept in
+# sync with the equivalent scrub in scripts/slm.py.
+_PURE_NAME_INLINE = re.compile(r"\b(everpure|pure\s?storage)\b", re.IGNORECASE)
+
+
+def scrub_pure_name(text: str) -> str:
+    """Replace any literal mention of the real company name with 'Pure'."""
+    if not text:
+        return text
+    return _PURE_NAME_INLINE.sub("Pure", text)
+
 PRAISE_PATTERNS = re.compile(
     r"\b(great|excellent|amazing|best[-\s]?in[-\s]?class|leader|outperform|"
     r"superior|impressive|reliable|innovative|game[-\s]?changer|"
@@ -525,7 +541,7 @@ def competitor_watch(text: str, title: str = "") -> dict:
         "alert_level": alert_level,
         "classification": classification,
         "entities_detected": sorted(set(entities_detected)),
-        "signal_text": signal_text[:200],
+        "signal_text": scrub_pure_name(signal_text[:200]),
     }
 
 

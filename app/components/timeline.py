@@ -1,49 +1,60 @@
 """
 Timeline component for Community Pulse.
 
-Renders a "Source vs. Sentiment" chart using Altair, filtered to the last 30 days.
-Uses the enterprise color palette:
-- Deep navy (#1B2A4A) for neutral signals
-- Red (#DC2626) for threats
-- Green (#16A34A) for opportunities
+Renders a "Source vs. Sentiment" chart using Altair, styled to match the
+dark Ops Console theme. The caller is responsible for date-range
+filtering (see app/utils/filters.py) — this component just plots
+whatever DataFrame it's given.
 """
 
 import altair as alt
 import pandas as pd
 import streamlit as st
 
+from app.utils.theme import BORDER, GREEN, MUTED, ORANGE, SURFACE, TEXT
 
-def render(df: pd.DataFrame):
-    """Render a Source vs. Sentiment scatter chart for the last 30 days."""
-    st.subheader("Source vs. Sentiment (Last 30 Days)")
+DARK_CHART_CONFIG = {
+    "background": SURFACE,
+    "axis": {
+        "domainColor": BORDER,
+        "gridColor": BORDER,
+        "tickColor": BORDER,
+        "labelColor": MUTED,
+        "titleColor": TEXT,
+        "labelFont": "IBM Plex Sans",
+        "titleFont": "IBM Plex Mono",
+    },
+    "legend": {
+        "labelColor": TEXT,
+        "titleColor": MUTED,
+        "labelFont": "IBM Plex Sans",
+        "titleFont": "IBM Plex Mono",
+    },
+    "view": {"stroke": BORDER},
+}
+
+
+def render(df: pd.DataFrame, title: str = "Source vs. Sentiment"):
+    """Render a Source vs. Sentiment scatter chart for the given (already
+    date-filtered) DataFrame."""
+    st.subheader(title)
 
     if df.empty:
-        st.info("No signal data available to plot.")
+        st.info("No signals in the selected date range.")
         return
 
-    # Filter to last 30 days
-    now = pd.Timestamp.now(tz="UTC")
-    thirty_days_ago = now - pd.Timedelta(days=30)
-    plot_df = df[df["date"] >= thirty_days_ago].copy()
-
-    if plot_df.empty:
-        st.info("No signals in the last 30 days.")
-        return
-
-    # Assign color based on classification
+    plot_df = df.copy()
     classification_color_map = {
-        "threat": "#DC2626",
-        "opportunity": "#16A34A",
-        "neutral": "#6B7280",
+        "threat": ORANGE,
+        "opportunity": GREEN,
+        "neutral": MUTED,
     }
-    # If no classification column, default to neutral
     if "classification" not in plot_df.columns:
         plot_df["classification"] = "neutral"
 
-    # Build the chart
     chart = (
         alt.Chart(plot_df)
-        .mark_circle(size=100, opacity=0.8, stroke="white", strokeWidth=1)
+        .mark_circle(size=100, opacity=0.85, stroke=SURFACE, strokeWidth=1)
         .encode(
             x=alt.X(
                 "source:N",
@@ -55,7 +66,7 @@ def render(df: pd.DataFrame):
                 "sentiment_score:Q",
                 title="Sentiment Score",
                 scale=alt.Scale(domain=[-1.0, 1.0]),
-                axis=alt.Axis(gridColor="#E5E7EB", titleFontSize=13),
+                axis=alt.Axis(titleFontSize=13),
             ),
             color=alt.Color(
                 "classification:N",
@@ -64,11 +75,7 @@ def render(df: pd.DataFrame):
                     domain=list(classification_color_map.keys()),
                     range=list(classification_color_map.values()),
                 ),
-                legend=alt.Legend(
-                    orient="top-right",
-                    labelFontSize=12,
-                    titleFontSize=13,
-                ),
+                legend=alt.Legend(orient="top-right", labelFontSize=12, titleFontSize=13),
             ),
             tooltip=[
                 alt.Tooltip("source:N", title="Source"),
@@ -79,31 +86,20 @@ def render(df: pd.DataFrame):
                 alt.Tooltip("content_preview:N", title="Preview"),
             ],
         )
-        .properties(height=400)
         .interactive()
     )
 
-    # Horizontal reference line at y=0
     hline = (
         alt.Chart(pd.DataFrame({"y": [0]}))
-        .mark_rule(color="#9CA3AF", strokeDash=[4, 4], strokeWidth=1)
+        .mark_rule(color=MUTED, strokeDash=[4, 4], strokeWidth=1)
         .encode(y="y:Q")
     )
 
-    # Add a subtle jitter on x-axis to avoid overlapping points from same source
-    jittered = chart.encode(
-        x=alt.X(
-            "source:N",
-            title="Source",
-            sort="-y",
-            axis=alt.Axis(labelAngle=-25, labelFontSize=11),
-        ),
-    )
+    combined = (chart + hline).properties(height=380).configure(**DARK_CHART_CONFIG)
 
-    st.altair_chart(jittered + hline, use_container_width=True)
+    st.altair_chart(combined, use_container_width=True)
 
-    # Legend caption
     st.caption(
-        "🟢 Green = Opportunity  |  🔴 Red = Threat  |  ⚫ Gray = Neutral. "
-        "Dashed line = neutral sentiment (0.0)."
+        "● Green = Opportunity  |  ▲ Orange = Threat  |  ■ Gray = Neutral. "
+        "Chart reflects the date range selected in the sidebar."
     )
